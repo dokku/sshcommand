@@ -7,7 +7,7 @@ SELF=`which $0`
 
 case "$1" in
   create) # sshcommand create <user>
-    if [[ $# -ne 3 ]]; then
+    if [[ $# -ne 2 ]]; then
       echo "Usage : sshcommand create user"
       exit -1
     fi
