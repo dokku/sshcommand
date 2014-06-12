@@ -6,9 +6,9 @@ shopt -s nocasematch #For case insensitive string matching, for the first parame
 SELF=`which $0`
 
 case "$1" in
-  create) # sshcommand create <user> <command>
+  create) # sshcommand create <user>
     if [[ $# -ne 3 ]]; then
-      echo "Usage : sshcommand create user command"
+      echo "Usage : sshcommand create user"
       exit -1
     fi
     USER="$2"; COMMAND="$3"
@@ -19,10 +19,8 @@ case "$1" in
         adduser --disabled-password --gecos "" $USER
     fi
 
-    mkdir -p $(sh -c "echo ~$USER")/.ssh
-    touch $(sh -c "echo ~$USER")/.ssh/authorized_keys
-    echo "$COMMAND" > $(sh -c "echo ~$USER")/.sshcommand
-    chown -R $USER $(sh -c "echo ~$USER")
+    sudo -u $USER mkdir -p $(sh -c "echo ~$USER")/.ssh
+    sudo -u $USER touch $(sh -c "echo ~$USER")/.ssh/authorized_keys
     ;;
 
   acl-add) # sshcommand acl-add <user> <identifier>
@@ -36,7 +34,8 @@ case "$1" in
 
     KEY=$(cat)
     FINGERPRINT=$(ssh-keygen -lf /dev/stdin <<< $(echo $KEY) | awk '{print $2}')
-    KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=$NAME \`cat $(sh -c "echo ~$USER")/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-user-rc,no-X11-forwarding,no-port-forwarding"
+    command="$(sh -c "echo ~$USER")/.sshcommand"
+    KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=$NAME $command\",no-user-rc,no-X11-forwarding,no-port-forwarding"
     echo "$KEY_PREFIX $KEY" >> $(sh -c "echo ~$USER")/.ssh/authorized_keys
     echo $FINGERPRINT
     ;;
@@ -54,7 +53,7 @@ case "$1" in
     ;;
 
   help|*) # sshcommand help
-    echo "Usage : sshcommand create user command"
+    echo "Usage : sshcommand create user"
     echo "        sshcommand acl-add user identifier"
     echo "        sshcommand acl-remove user identifier"
     echo "        sshcommand help # shows this usage message"
