@@ -16,10 +16,11 @@ check_authorized_keys_entry() {
   local KEYFILE_NAME="$1"
   local ENTRY_ID="$2"
 
-  run bash -c "sed -n 's/.*\(NAME=$ENTRY_ID.*\)\ \`.*/\1/p' /home/${TEST_USER}/.ssh/authorized_keys"
+  run bash -c "sed -n 's/.*\(NAME=\\\\\"${ENTRY_ID}\\\\\"\).*/\1/p' /home/${TEST_USER}/.ssh/authorized_keys"
+  echo "entry: " $(grep $ENTRY_ID /home/${TEST_USER}/.ssh/authorized_keys)
   echo "output: "$output
   echo "status: "$status
-  assert_output "NAME=$ENTRY_ID"
+  assert_output "NAME=\\\"$ENTRY_ID\\\""
 }
 
 @test "(core) sshcommand create" {
@@ -64,18 +65,14 @@ check_authorized_keys_entry() {
   assert_failure
 }
 
-# # not supported yet
-# @test "(core) sshcommand acl-add (with identifier space)" {
-#   run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER 'broken user'"
-#   echo "output: "$output
-#   echo "status: "$status
-#   assert_success
+@test "(core) sshcommand acl-add (with identifier space)" {
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER 'broken user'"
+  echo "output: "$output
+  echo "status: "$status
+  assert_success
 
-#   run bash -c "grep 'broken user' ~${TEST_USER}/.ssh/authorized_keys | sed 's/.*\(NAME=.*\) \`.*/\1/'"
-#   echo "output: "$output
-#   echo "status: "$status
-#   assert_output ""
-# }
+  check_authorized_keys_entry $TEST_KEY_NAME 'broken user'
+}
 
 @test "(core) sshcommand acl-remove" {
   run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER user1"
