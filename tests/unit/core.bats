@@ -74,6 +74,19 @@ check_authorized_keys_entry() {
   check_authorized_keys_entry $TEST_KEY_NAME 'broken user'
 }
 
+@test "(core) sshcommand acl-add (duplicate key)" {
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER user1"
+  echo "output: "$output
+  echo "status: "$status
+
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER user1"
+  echo "output: "$output
+  echo "status: "$status
+
+  assert_failure
+  check_authorized_keys_entry $TEST_KEY_NAME user1
+}
+
 @test "(core) sshcommand acl-remove" {
   run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER user1"
   echo "output: "$output
