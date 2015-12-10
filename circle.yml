@@ -1,0 +1,7 @@
+dependencies:
+  override:
+    - make -e ci-dependencies
+    - sudo make -e install
+test:
+  override:
+    - sudo make -e test
