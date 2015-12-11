@@ -1,0 +1,9 @@
+FROM gcc:latest
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN true
+
+ADD . /app
+WORKDIR /app
+
+RUN apt-get update && apt-get install -qq -y software-properties-common sudo
+RUN make -e ci-dependencies

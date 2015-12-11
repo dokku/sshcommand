@@ -3,8 +3,6 @@ set -e
 
 shopt -s nocasematch #For case insensitive string matching, for the first parameter
 
-SELF=`which $0`
-
 case "$1" in
   create) # sshcommand create <user> <command>
     if [[ $# -ne 3 ]]; then
@@ -13,17 +11,17 @@ case "$1" in
     fi
     USER="$2"; COMMAND="$3"
 
-    if id -u $USER >/dev/null 2>&1; then
+    if id -u "$USER" >/dev/null 2>&1; then
       echo "User '$USER' already exists"
     else
-      adduser --disabled-password --gecos "" $USER
+      adduser --disabled-password --gecos "" "$USER"
     fi
 
     USERHOME=$(sh -c "echo ~$USER")
     mkdir -p "$USERHOME/.ssh"
-    touch $USERHOME/.ssh/authorized_keys
+    touch "$USERHOME/.ssh/authorized_keys"
     echo "$COMMAND" > "$USERHOME/.sshcommand"
-    chown -R $USER $USERHOME
+    chown -R "$USER" "$USERHOME"
     ;;
 
   acl-add) # sshcommand acl-add <user> <identifier>
@@ -33,7 +31,7 @@ case "$1" in
     fi
     USER="$2"; NAME="$3"
 
-    getent passwd $USER > /dev/null || false
+    getent passwd "$USER" > /dev/null || false
     USERHOME=$(sh -c "echo ~$USER")
 
     KEY_FILE=$(mktemp)
@@ -50,7 +48,7 @@ case "$1" in
     fi
     KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=$NAME \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
     echo "$KEY_PREFIX $KEY" >> "$USERHOME/.ssh/authorized_keys"
-    echo $FINGERPRINT
+    echo "$FINGERPRINT"
     ;;
 
   acl-remove) # sshcommand acl-remove <user> <identifier>
@@ -60,7 +58,7 @@ case "$1" in
     fi
     USER="$2"; NAME="$3"
 
-    getent passwd $USER > /dev/null || false
+    getent passwd "$USER" > /dev/null || false
     USERHOME=$(sh -c "echo ~$USER")
 
     sed --in-place "/ NAME=$NAME /d" "$USERHOME/.ssh/authorized_keys"
