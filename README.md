@@ -1,11 +1,11 @@
-# sshcommand
+# sshcommand [![Build Status](https://img.shields.io/circleci/project/progrium/sshcommand/master.svg?style=flat-square "Build Status")](https://circleci.com/gh/progrium/sshcommand/tree/master)
 
-Simplifies running a single command over SSH, and manages authorized keys (ACL) and users in order to do so. 
+Simplifies running a single command over SSH, and manages authorized keys (ACL) and users in order to do so.
 
 It basically simplifies running:
 
 ```
-ssh user@server 'ls -l <your-args>'  
+ssh user@server 'ls -l <your-args>'
 ```
 
 into:
@@ -31,16 +31,16 @@ On a server, create a new command user:
 On your computer, add authorized keys with your key:
 
     $ cat ~/.ssh/id_rsa.pub | ssh root@server sshcommand acl-add cmd progrium
-    
+
 Now anywhere with the private key you can easily run:
 
     $ ssh cmd@server
-    
+
 Anything you pass as the command string will be appended to the command. You can use this
 to pass arguments or if your command takes subcommands, expose those subcommands easily.
 
-    $ /path/to/command subcommand 
-    
+    $ /path/to/command subcommand
+
 Can be run remotely with:
 
     $ ssh cmd@server subcommand
