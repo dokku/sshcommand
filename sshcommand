@@ -33,7 +33,6 @@ case "$1" in
 
     getent passwd "$USER" > /dev/null || false
     USERHOME=$(sh -c "echo ~$USER")
-
     KEY_FILE=$(mktemp)
     KEY=$(tee "$KEY_FILE")
     delete_key_file() {
@@ -46,7 +45,7 @@ case "$1" in
       echo "Invalid ssh public key"
       exit -1
     fi
-    KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=$NAME \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
+    KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
     echo "$KEY_PREFIX $KEY" >> "$USERHOME/.ssh/authorized_keys"
     echo "$FINGERPRINT"
     ;;
@@ -61,7 +60,7 @@ case "$1" in
     getent passwd "$USER" > /dev/null || false
     USERHOME=$(sh -c "echo ~$USER")
 
-    sed --in-place "/ NAME=$NAME /d" "$USERHOME/.ssh/authorized_keys"
+    sed --in-place "/ NAME=\\\\\"$NAME\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
     ;;
 
   help|*) # sshcommand help
@@ -72,4 +71,3 @@ case "$1" in
     ;;
 
 esac
-
