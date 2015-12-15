@@ -3,6 +3,31 @@ set -e
 
 shopt -s nocasematch #For case insensitive string matching, for the first parameter
 
+OSRELEASE=/etc/os-release
+
+f_print_os_name() {
+  sed -n 's#^NAME="\(.*\)"#\1#p' $OSRELEASE
+  return 0
+}
+
+f_adduser() {
+  local l_user l_platform
+
+  l_user=$1
+  l_platform="$(f_print_os_name)"
+  case $l_platform in
+    Debian|Ubuntu)
+      adduser --disabled-password --gecos "" $l_user
+      ;;
+    SLES|*)
+      useradd -m -s /bin/bash $l_user
+      groupadd $l_user
+      usermod -L -aG $l_user $l_user
+      ;;
+
+  esac
+}
+
 case "$1" in
   create) # sshcommand create <user> <command>
     if [[ $# -ne 3 ]]; then
@@ -14,7 +39,7 @@ case "$1" in
     if id -u "$USER" >/dev/null 2>&1; then
       echo "User '$USER' already exists"
     else
-      adduser --disabled-password --gecos "" "$USER"
+      f_adduser "$USER"
     fi
 
     USERHOME=$(sh -c "echo ~$USER")
