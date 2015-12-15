@@ -19,7 +19,7 @@ f_adduser() {
     Debian|Ubuntu)
       adduser --disabled-password --gecos "" $l_user
       ;;
-    SLES|*)
+    *)
       useradd -m -s /bin/bash $l_user
       groupadd $l_user
       usermod -L -aG $l_user $l_user
