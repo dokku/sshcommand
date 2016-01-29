@@ -16,7 +16,7 @@ f_adduser() {
   l_user=$1
   l_platform="$(f_print_os_name)"
   case $l_platform in
-    Debian*|Ubuntu)
+    Debian*|Ubuntu|Raspbian*)
       adduser --disabled-password --gecos "" "$l_user"
       ;;
     *)
