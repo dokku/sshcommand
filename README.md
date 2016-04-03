@@ -18,7 +18,7 @@ ssh ls@server <your-args>
 
 ```shell
 sshcommand create     <USER> <COMMAND>          # Creates a user forced to run command when SSH connects
-sshcommand acl-add    <USER> <NAME>             # Adds named SSH key to user from STDIN or argument
+sshcommand acl-add    <USER> <NAME> <KEY_FILE>  # Adds named SSH key to user from STDIN or argument
 sshcommand acl-remove <USER> <NAME>             # Removes SSH key by name
 sshcommand help       <COMMAND>                 # Shows help information
 ```
@@ -32,6 +32,10 @@ On a server, create a new command user:
 On your computer, add authorized keys with your key:
 
     $ cat ~/.ssh/id_rsa.pub | ssh root@server sshcommand acl-add cmd progrium
+
+If the public key is already on the server, you may also specify it as an argument:
+
+    $ ssh root@server sshcommand acl-add cmd progrium ~/.ssh/id_rsa.pub
 
 Now anywhere with the private key you can easily run:
 

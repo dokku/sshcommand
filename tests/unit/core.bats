@@ -58,6 +58,22 @@ check_authorized_keys_entry() {
   check_authorized_keys_entry new_key user2
 }
 
+@test "(core) sshcommand acl-add (as argument)" {
+  run bash -c "sshcommand acl-add $TEST_USER user1 ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub"
+  echo "output: "$output
+  echo "status: "$status
+  assert_success
+
+  create_test_key new_key
+  run bash -c "sshcommand acl-add $TEST_USER user2 ${TEST_KEY_DIR}/new_key.pub"
+  echo "output: "$output
+  echo "status: "$status
+  assert_success
+
+  check_authorized_keys_entry $TEST_KEY_NAME user1
+  check_authorized_keys_entry new_key user2
+}
+
 @test "(core) sshcommand acl-add (bad key failure)" {
   run bash -c "echo test_key | sshcommand acl-add $TEST_USER user1"
   echo "output: "$output

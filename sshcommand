@@ -102,7 +102,7 @@ sshcommand-create() {
 
 sshcommand-acl-add() {
   declare desc="Adds named SSH key to user from STDIN or argument"
-  declare USER="$1" NAME="$2"
+  declare USER="$1" NAME="$2" KEY_FILE="$3"
   local FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
 
   if [[ -z "$USER" ]] || [[ -z "$NAME" ]]; then
@@ -117,12 +117,14 @@ sshcommand-acl-add() {
     log-fail "Duplicate SSH Key name"
   fi
 
-  KEY_FILE=$(mktemp)
-  KEY=$(tee "$KEY_FILE")
-  delete_key_file() {
-    rm -f "$KEY_FILE"
-  }
-  trap delete_key_file INT EXIT
+  if [[ -z "$KEY_FILE" ]]; then
+    KEY_FILE=$(mktemp)
+    KEY=$(tee "$KEY_FILE")
+    trap 'rm -f "$KEY_FILE"' INT EXIT
+  else
+    KEY=$(cat "$KEY_FILE")
+  fi
+
   FINGERPRINT=$(ssh-keygen -lf "$KEY_FILE" | awk '{print $2}')
 
   if [[ ! "$FINGERPRINT" =~ :.* ]]; then
