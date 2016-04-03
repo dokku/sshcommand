@@ -68,6 +68,7 @@ fn-adduser() {
 log-fail() {
   declare desc="Log fail formatter"
   echo "$@" 1>&2
+  exit -1
 }
 
 log-verbose() {
@@ -84,7 +85,6 @@ sshcommand-create() {
 
   if [[ -z "$USER" ]] || [[ -z "$COMMAND" ]]; then
     log-fail "Usage: sshcommand create" "$(fn-args "sshcommand-create")"
-    exit -1
   fi
 
   if id -u "$USER" >/dev/null 2>&1; then
@@ -107,7 +107,6 @@ sshcommand-acl-add() {
 
   if [[ -z "$USER" ]] || [[ -z "$NAME" ]]; then
     log-fail "Usage: sshcommand acl-add" "$(fn-args "sshcommand-acl-add")"
-    exit -1
   fi
 
   getent passwd "$USER" > /dev/null || false
@@ -116,7 +115,6 @@ sshcommand-acl-add() {
   NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
   if [[ ! -z "$NEW_KEY" ]]; then
     log-fail "Duplicate SSH Key name"
-    exit -1
   fi
 
   KEY_FILE=$(mktemp)
@@ -129,7 +127,6 @@ sshcommand-acl-add() {
 
   if [[ ! "$FINGERPRINT" =~ :.* ]]; then
     log-fail "Invalid ssh public key"
-    exit -1
   fi
 
   KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
@@ -144,7 +141,6 @@ sshcommand-acl-remove() {
 
   if [[ -z "$USER" ]] || [[ -z "$NAME" ]]; then
     log-fail "Usage: sshcommand acl-remove" "$(fn-args "sshcommand-acl-remove")"
-    exit -1
   fi
 
   getent passwd "$USER" > /dev/null || false
@@ -182,8 +178,7 @@ main() {
   if declare -f $cmd > /dev/null; then
     $cmd "$@"
   else
-    log-fail "invalid command"
-    exit 1
+    log-fail "Invalid command"
   fi
 }
 
