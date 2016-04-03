@@ -38,7 +38,6 @@ f_adduser() {
       groupadd "$l_user"
       usermod -L -aG "$l_user" "$l_user"
       ;;
-
   esac
 }
 
@@ -47,7 +46,7 @@ sshcommand-create() {
   declare USER="$2" COMMAND="$3"
   local USERHOME
 
-  if [[ $# -ne 3 ]]; then
+  if [[ -z "$USER" ]] || [[ -z "$COMMAND" ]]; then
     log-fail "Usage : sshcommand create user command"
     exit -1
   fi
@@ -70,7 +69,7 @@ sshcommand-acl-add() {
   declare USER="$2" IDENTIFIER="$3"
   local FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
 
-  if [[ $# -ne 3 ]]; then
+  if [[ -z "$USER" ]] || [[ -z "$IDENTIFIER" ]]; then
     log-fail "Usage : sshcommand acl-add user identifier"
     exit -1
   fi
@@ -107,7 +106,7 @@ sshcommand-acl-remove() {
   declare USER="$2" IDENTIFIER="$3"
   local USERHOME
 
-  if [[ $# -ne 3 ]]; then
+  if [[ -z "$USER" ]] || [[ -z "$IDENTIFIER" ]]; then
     log-fail "Usage : sshcommand acl-remove user identifier"
     exit -1
   fi
