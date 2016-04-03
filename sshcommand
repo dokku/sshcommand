@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail; [[ $SSHCOMMAND_TRACE ]] && set -x
+shopt -s nocasematch # For case insensitive string matching, for the first parameter
 
-shopt -s nocasematch #For case insensitive string matching, for the first parameter
 
 readonly OSRELEASE=/etc/os-release
 
