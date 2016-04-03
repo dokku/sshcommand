@@ -19,7 +19,7 @@ log-verbose() {
 
 f_print_os_name() {
   declare desc="Returns the release name of the operating system"
-  sed -n 's#^NAME="\(.*\)"#\1#p' "$OSRELEASE"
+  sed -n 's#^NAME="\(.*\)"#\1#p' "$OSRELEASE" | sed 's/./\L&/g'
   return 0
 }
 
@@ -30,7 +30,7 @@ f_adduser() {
   l_user=$1
   l_platform="$(f_print_os_name)"
   case $l_platform in
-    Debian*|Ubuntu|Raspbian*)
+    debian*|ubuntu|raspbian*)
       adduser --disabled-password --gecos "" "$l_user"
       ;;
     *)
