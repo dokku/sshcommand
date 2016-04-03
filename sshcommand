@@ -29,11 +29,11 @@ f_adduser() {
 }
 
 sshcommand-create() {
+  declare USER="$2" COMMAND="$3"
   if [[ $# -ne 3 ]]; then
     echo "Usage : sshcommand create user command"
     exit -1
   fi
-  USER="$2"; COMMAND="$3"
 
   if id -u "$USER" >/dev/null 2>&1; then
     echo "User '$USER' already exists"
@@ -49,11 +49,11 @@ sshcommand-create() {
 }
 
 sshcommand-acl-add() {
+  declare USER="$2" NAME="$3"
   if [[ $# -ne 3 ]]; then
     echo "Usage : sshcommand acl-add user identifier"
     exit -1
   fi
-  USER="$2"; NAME="$3"
 
   getent passwd "$USER" > /dev/null || false
   USERHOME=$(sh -c "echo ~$USER")
@@ -83,11 +83,11 @@ sshcommand-acl-add() {
 }
 
 sshcommand-acl-remove() {
+  declare USER="$2" NAME="$3"
   if [[ $# -ne 3 ]]; then
     echo "Usage : sshcommand acl-remove user identifier"
     exit -1
   fi
-  USER="$2"; NAME="$3"
 
   getent passwd "$USER" > /dev/null || false
   USERHOME=$(sh -c "echo ~$USER")
