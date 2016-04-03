@@ -3,10 +3,10 @@ set -e
 
 shopt -s nocasematch #For case insensitive string matching, for the first parameter
 
-OSRELEASE=/etc/os-release
+readonly OSRELEASE=/etc/os-release
 
 f_print_os_name() {
-  sed -n 's#^NAME="\(.*\)"#\1#p' $OSRELEASE
+  sed -n 's#^NAME="\(.*\)"#\1#p' "$OSRELEASE"
   return 0
 }
 
