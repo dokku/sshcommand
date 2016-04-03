@@ -42,6 +42,8 @@ f_adduser() {
 
 sshcommand-create() {
   declare USER="$2" COMMAND="$3"
+  local USERHOME
+
   if [[ $# -ne 3 ]]; then
     log-fail "Usage : sshcommand create user command"
     exit -1
@@ -62,6 +64,8 @@ sshcommand-create() {
 
 sshcommand-acl-add() {
   declare USER="$2" NAME="$3"
+  local FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
+
   if [[ $# -ne 3 ]]; then
     log-fail "Usage : sshcommand acl-add user identifier"
     exit -1
@@ -96,6 +100,8 @@ sshcommand-acl-add() {
 
 sshcommand-acl-remove() {
   declare USER="$2" NAME="$3"
+  local USERHOME
+
   if [[ $# -ne 3 ]]; then
     log-fail "Usage : sshcommand acl-remove user identifier"
     exit -1
