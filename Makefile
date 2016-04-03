@@ -32,7 +32,9 @@ install:
 
 lint:
 	@echo linting...
-	@$(QUIET) find . -not -path '*/\.*' | xargs file | egrep "shell|bash" | awk '{ print $$1 }' | sed 's/://g' | xargs shellcheck
+	# SC2034: VAR appears unused - https://github.com/koalaman/shellcheck/wiki/SC2034
+	# desc is used to declare the description of the function
+	@$(QUIET) find . -not -path '*/\.*' | xargs file | egrep "shell|bash" | awk '{ print $$1 }' | sed 's/://g' | xargs shellcheck -e SC2034
 
 unit-tests:
 	@echo running unit tests...

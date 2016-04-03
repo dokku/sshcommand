@@ -5,6 +5,18 @@ shopt -s nocasematch #For case insensitive string matching, for the first parame
 
 readonly OSRELEASE=/etc/os-release
 
+log-fail() {
+  declare desc="log fail formatter"
+  echo "$@" 1>&2
+}
+
+log-verbose() {
+  declare desc="log verbose formatter"
+  if [[ ! -z "$SSHCOMMAND_VERBOSE_OUTPUT" ]]; then
+    echo "$@"
+  fi
+}
+
 f_print_os_name() {
   sed -n 's#^NAME="\(.*\)"#\1#p' "$OSRELEASE"
   return 0
@@ -31,12 +43,12 @@ f_adduser() {
 sshcommand-create() {
   declare USER="$2" COMMAND="$3"
   if [[ $# -ne 3 ]]; then
-    echo "Usage : sshcommand create user command"
+    log-fail "Usage : sshcommand create user command"
     exit -1
   fi
 
   if id -u "$USER" >/dev/null 2>&1; then
-    echo "User '$USER' already exists"
+    log-verbose "User '$USER' already exists"
   else
     f_adduser "$USER"
   fi
@@ -51,7 +63,7 @@ sshcommand-create() {
 sshcommand-acl-add() {
   declare USER="$2" NAME="$3"
   if [[ $# -ne 3 ]]; then
-    echo "Usage : sshcommand acl-add user identifier"
+    log-fail "Usage : sshcommand acl-add user identifier"
     exit -1
   fi
 
@@ -60,7 +72,7 @@ sshcommand-acl-add() {
 
   NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
   if [[ ! -z "$NEW_KEY" ]]; then
-    echo "Duplicate SSH Key name" >&2
+    log-fail "Duplicate SSH Key name" >&2
     exit -1
   fi
 
@@ -73,7 +85,7 @@ sshcommand-acl-add() {
   FINGERPRINT=$(ssh-keygen -lf "$KEY_FILE" | awk '{print $2}')
 
   if [[ ! "$FINGERPRINT" =~ :.* ]]; then
-    echo "Invalid ssh public key"
+    log-fail "Invalid ssh public key"
     exit -1
   fi
 
@@ -85,7 +97,7 @@ sshcommand-acl-add() {
 sshcommand-acl-remove() {
   declare USER="$2" NAME="$3"
   if [[ $# -ne 3 ]]; then
-    echo "Usage : sshcommand acl-remove user identifier"
+    log-fail "Usage : sshcommand acl-remove user identifier"
     exit -1
   fi
 
