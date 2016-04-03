@@ -61,6 +61,10 @@ fn-adduser() {
   l_user=$1
   l_platform="$(fn-print-os-id)"
   case $l_platform in
+    alpine)
+      adduser -D -g "" -s /bin/bash "$l_user"
+      passwd -u "$l_user"
+      ;;
     debian*|ubuntu|raspbian*)
       adduser --disabled-password --gecos "" "$l_user"
       ;;
