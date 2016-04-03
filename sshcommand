@@ -67,7 +67,7 @@ sshcommand-create() {
 
 sshcommand-acl-add() {
   declare desc="Adds an ssh public key by an identifier to a user"
-  declare USER="$2" NAME="$3"
+  declare USER="$2" IDENTIFIER="$3"
   local FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
 
   if [[ $# -ne 3 ]]; then
@@ -78,7 +78,7 @@ sshcommand-acl-add() {
   getent passwd "$USER" > /dev/null || false
   USERHOME=$(sh -c "echo ~$USER")
 
-  NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
+  NEW_KEY=$(grep "NAME=\\\\\"$IDENTIFIER"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
   if [[ ! -z "$NEW_KEY" ]]; then
     log-fail "Duplicate SSH Key name" >&2
     exit -1
@@ -97,14 +97,14 @@ sshcommand-acl-add() {
     exit -1
   fi
 
-  KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
+  KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$IDENTIFIER\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
   echo "$KEY_PREFIX $KEY" >> "$USERHOME/.ssh/authorized_keys"
   echo "$FINGERPRINT"
 }
 
 sshcommand-acl-remove() {
   declare desc="Adds an identifier from a user"
-  declare USER="$2" NAME="$3"
+  declare USER="$2" IDENTIFIER="$3"
   local USERHOME
 
   if [[ $# -ne 3 ]]; then
@@ -115,7 +115,7 @@ sshcommand-acl-remove() {
   getent passwd "$USER" > /dev/null || false
   USERHOME=$(sh -c "echo ~$USER")
 
-  sed --in-place "/ NAME=\\\\\"$NAME\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
+  sed --in-place "/ NAME=\\\\\"$IDENTIFIER\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
 }
 
 sshcommand-help() {
