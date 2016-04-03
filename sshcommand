@@ -46,7 +46,11 @@ fn-info() {
 fn-print-os-id() {
   declare desc="Returns the release id of the operating system"
   local OSRELEASE="${SSHCOMMAND_OSRELEASE:="/etc/os-release"}"
-  sed -n 's#^ID=\(.*\)#\1#p' "$OSRELEASE"
+  if [[ -f $OSRELEASE ]]; then
+    sed -n 's#^ID=\(.*\)#\1#p' "$OSRELEASE"
+  else
+    echo unknown
+  fi
   return 0
 }
 

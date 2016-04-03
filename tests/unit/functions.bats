@@ -23,3 +23,12 @@ load test_helper
   assert_output "alpine"
   assert_success
 }
+
+@test "(fn) print-os-id (invalid path)" {
+  load "/usr/local/bin/sshcommand"
+  SSHCOMMAND_OSRELEASE=/tmp/nonexistent-os-release run "fn-print-os-id"
+  echo "output: "$output
+  echo "status: "$status
+  assert_output "unknown"
+  assert_success
+}
