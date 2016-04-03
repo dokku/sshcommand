@@ -43,7 +43,7 @@ f_adduser() {
 
 sshcommand-create() {
   declare desc="Creates an sshcommand for a specific user"
-  declare USER="$2" COMMAND="$3"
+  declare USER="$1" COMMAND="$2"
   local USERHOME
 
   if [[ -z "$USER" ]] || [[ -z "$COMMAND" ]]; then
@@ -66,7 +66,7 @@ sshcommand-create() {
 
 sshcommand-acl-add() {
   declare desc="Adds an ssh public key by an identifier to a user"
-  declare USER="$2" IDENTIFIER="$3"
+  declare USER="$1" IDENTIFIER="$2"
   local FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
 
   if [[ -z "$USER" ]] || [[ -z "$IDENTIFIER" ]]; then
@@ -103,7 +103,7 @@ sshcommand-acl-add() {
 
 sshcommand-acl-remove() {
   declare desc="Adds an identifier from a user"
-  declare USER="$2" IDENTIFIER="$3"
+  declare USER="$1" IDENTIFIER="$2"
   local USERHOME
 
   if [[ -z "$USER" ]] || [[ -z "$IDENTIFIER" ]]; then
@@ -131,7 +131,10 @@ main() {
     exit 1
   fi
 
-  case "$1" in
+  local cmd="$1"
+  shift 1
+
+  case "$cmd" in
     create) # sshcommand create <user> <command>
       sshcommand-create "$@"
       ;;
