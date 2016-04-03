@@ -7,7 +7,7 @@ if [[ -f /etc/defaults/sshcommand ]]; then
   source /etc/defaults/sshcommand
 fi
 
-readonly OSRELEASE=/etc/os-release
+readonly OSRELEASE="${SSHCOMMAND_OSRELEASE:="/etc/os-release"}"
 
 cmd-help() {
   declare desc="Shows help information for a command"
