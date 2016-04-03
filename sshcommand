@@ -6,23 +6,25 @@ shopt -s nocasematch #For case insensitive string matching, for the first parame
 readonly OSRELEASE=/etc/os-release
 
 log-fail() {
-  declare desc="log fail formatter"
+  declare desc="Log fail formatter"
   echo "$@" 1>&2
 }
 
 log-verbose() {
-  declare desc="log verbose formatter"
+  declare desc="Log verbose formatter"
   if [[ ! -z "$SSHCOMMAND_VERBOSE_OUTPUT" ]]; then
     echo "$@"
   fi
 }
 
 f_print_os_name() {
+  declare desc="Returns the release name of the operating system"
   sed -n 's#^NAME="\(.*\)"#\1#p' "$OSRELEASE"
   return 0
 }
 
 f_adduser() {
+  declare desc="Add a user to the system"
   local l_user l_platform
 
   l_user=$1
@@ -41,6 +43,7 @@ f_adduser() {
 }
 
 sshcommand-create() {
+  declare desc="Creates an sshcommand for a specific user"
   declare USER="$2" COMMAND="$3"
   local USERHOME
 
@@ -63,6 +66,7 @@ sshcommand-create() {
 }
 
 sshcommand-acl-add() {
+  declare desc="Adds an ssh public key by an identifier to a user"
   declare USER="$2" NAME="$3"
   local FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
 
@@ -99,6 +103,7 @@ sshcommand-acl-add() {
 }
 
 sshcommand-acl-remove() {
+  declare desc="Adds an identifier from a user"
   declare USER="$2" NAME="$3"
   local USERHOME
 
@@ -114,6 +119,7 @@ sshcommand-acl-remove() {
 }
 
 sshcommand-help() {
+  declare desc="Shows help information"
   echo "Usage : sshcommand create user command"
   echo "        sshcommand acl-add user identifier"
   echo "        sshcommand acl-remove user identifier"
