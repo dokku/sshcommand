@@ -131,30 +131,15 @@ main() {
     exit 1
   fi
 
-  local cmd="$1"
+  local cmd="sshcommand-$1"
   shift 1
 
-  case "$cmd" in
-    create) # sshcommand create <user> <command>
-      sshcommand-create "$@"
-      ;;
-
-    acl-add) # sshcommand acl-add <user> <identifier>
-      sshcommand-acl-add "$@"
-      ;;
-
-    acl-remove) # sshcommand acl-remove <user> <identifier>
-      sshcommand-acl-remove "$@"
-      ;;
-
-    help) # sshcommand help
-      sshcommand-help
-      ;;
-
-    *)
-      log-fail "invalid command"
-      exit 1
-  esac
+  if declare -f $cmd > /dev/null; then
+    $cmd "$@"
+  else
+    log-fail "invalid command"
+    exit 1
+  fi
 }
 
 main "$@"
