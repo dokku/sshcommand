@@ -5,6 +5,42 @@ shopt -s nocasematch #For case insensitive string matching, for the first parame
 
 readonly OSRELEASE=/etc/os-release
 
+cmd-help() {
+  declare desc="Shows help information for a command"
+  declare args="$*"
+  if [[ "$args" ]]; then
+    for cmd; do true; done # last arg
+    local fn="sshcommand-$cmd"
+    fn-info "$fn" 1
+  fi
+}
+
+fn-args() {
+  declare desc="Inspect a function's arguments"
+  local argline
+  argline=$(type "$1" | grep declare | grep -v "declare desc" | head -1)
+  echo -e "${argline// /"\n"}" | awk -F= '/=/{print "<"$1">"}' | tr "\n" " "
+}
+
+fn-desc() {
+  declare desc="Inspect a function's description"
+  desc=""
+  eval "$(type "$1" | grep desc | head -1)"; echo $desc
+}
+
+fn-info() {
+  declare desc="Inspects a function"
+  declare fn="$1" showsource="$2"
+  local fn_name="${1//sshcommand-/}"
+  echo "$fn_name $(fn-args "$fn")"
+  echo "  $(fn-desc "$fn")"
+  echo
+  if [[ "$showsource" ]]; then
+    type "$fn" | tail -n +2
+    echo
+  fi
+}
+
 log-fail() {
   declare desc="Log fail formatter"
   echo "$@" 1>&2
@@ -42,12 +78,12 @@ f_adduser() {
 }
 
 sshcommand-create() {
-  declare desc="Creates an sshcommand for a specific user"
+  declare desc="Creates a user forced to run command when SSH connects"
   declare USER="$1" COMMAND="$2"
   local USERHOME
 
   if [[ -z "$USER" ]] || [[ -z "$COMMAND" ]]; then
-    log-fail "Usage : sshcommand create user command"
+    log-fail "Usage: sshcommand create" "$(fn-args "sshcommand-create")"
     exit -1
   fi
 
@@ -65,19 +101,19 @@ sshcommand-create() {
 }
 
 sshcommand-acl-add() {
-  declare desc="Adds an ssh public key by an identifier to a user"
-  declare USER="$1" IDENTIFIER="$2"
+  declare desc="Adds named SSH key to user from STDIN or argument"
+  declare USER="$1" NAME="$2"
   local FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
 
-  if [[ -z "$USER" ]] || [[ -z "$IDENTIFIER" ]]; then
-    log-fail "Usage : sshcommand acl-add user identifier"
+  if [[ -z "$USER" ]] || [[ -z "$NAME" ]]; then
+    log-fail "Usage: sshcommand acl-add" "$(fn-args "sshcommand-acl-add")"
     exit -1
   fi
 
   getent passwd "$USER" > /dev/null || false
   USERHOME=$(sh -c "echo ~$USER")
 
-  NEW_KEY=$(grep "NAME=\\\\\"$IDENTIFIER"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
+  NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
   if [[ ! -z "$NEW_KEY" ]]; then
     log-fail "Duplicate SSH Key name"
     exit -1
@@ -96,38 +132,47 @@ sshcommand-acl-add() {
     exit -1
   fi
 
-  KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$IDENTIFIER\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
+  KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
   echo "$KEY_PREFIX $KEY" >> "$USERHOME/.ssh/authorized_keys"
   echo "$FINGERPRINT"
 }
 
 sshcommand-acl-remove() {
-  declare desc="Adds an identifier from a user"
-  declare USER="$1" IDENTIFIER="$2"
+  declare desc="Removes SSH key by name"
+  declare USER="$1" NAME="$2"
   local USERHOME
 
-  if [[ -z "$USER" ]] || [[ -z "$IDENTIFIER" ]]; then
-    log-fail "Usage : sshcommand acl-remove user identifier"
+  if [[ -z "$USER" ]] || [[ -z "$NAME" ]]; then
+    log-fail "Usage: sshcommand acl-remove" "$(fn-args "sshcommand-acl-remove")"
     exit -1
   fi
 
   getent passwd "$USER" > /dev/null || false
   USERHOME=$(sh -c "echo ~$USER")
 
-  sed --in-place "/ NAME=\\\\\"$IDENTIFIER\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
+  sed --in-place "/ NAME=\\\\\"$NAME\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
 }
 
 sshcommand-help() {
   declare desc="Shows help information"
-  echo "Usage : sshcommand create user command"
-  echo "        sshcommand acl-add user identifier"
-  echo "        sshcommand acl-remove user identifier"
-  echo "        sshcommand help # shows this usage message"
+  declare COMMAND="$1"
+
+  if [[ -n "$COMMAND" ]]; then
+    cmd-help "$COMMAND"
+    return 0
+  fi
+
+  echo "sshcommand"
+  echo ""
+  printf "  %-10s %-26s %s\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
+  printf "  %-10s %-26s %s\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
+  printf "  %-10s %-26s %s\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
+  printf "  %-10s %-26s %s\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
 }
 
 main() {
   if [[ -z "$1" ]]; then
-    sshcommand-help
+    sshcommand-help "$@"
     exit 1
   fi
 
