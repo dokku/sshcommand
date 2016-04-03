@@ -41,30 +41,18 @@ fn-info() {
   fi
 }
 
-log-fail() {
-  declare desc="Log fail formatter"
-  echo "$@" 1>&2
-}
-
-log-verbose() {
-  declare desc="Log verbose formatter"
-  if [[ ! -z "$SSHCOMMAND_VERBOSE_OUTPUT" ]]; then
-    echo "$@"
-  fi
-}
-
-f_print_os_name() {
+fn-print-os-name() {
   declare desc="Returns the release name of the operating system"
   sed -n 's#^NAME="\(.*\)"#\1#p' "$OSRELEASE" | sed 's/./\L&/g'
   return 0
 }
 
-f_adduser() {
+fn-adduser() {
   declare desc="Add a user to the system"
   local l_user l_platform
 
   l_user=$1
-  l_platform="$(f_print_os_name)"
+  l_platform="$(fn-print-os-name)"
   case $l_platform in
     debian*|ubuntu|raspbian*)
       adduser --disabled-password --gecos "" "$l_user"
@@ -75,6 +63,18 @@ f_adduser() {
       usermod -L -aG "$l_user" "$l_user"
       ;;
   esac
+}
+
+log-fail() {
+  declare desc="Log fail formatter"
+  echo "$@" 1>&2
+}
+
+log-verbose() {
+  declare desc="Log verbose formatter"
+  if [[ ! -z "$SSHCOMMAND_VERBOSE_OUTPUT" ]]; then
+    echo "$@"
+  fi
 }
 
 sshcommand-create() {
@@ -90,7 +90,7 @@ sshcommand-create() {
   if id -u "$USER" >/dev/null 2>&1; then
     log-verbose "User '$USER' already exists"
   else
-    f_adduser "$USER"
+    fn-adduser "$USER"
   fi
 
   USERHOME=$(sh -c "echo ~$USER")
