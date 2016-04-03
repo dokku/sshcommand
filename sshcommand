@@ -43,10 +43,10 @@ fn-info() {
   fi
 }
 
-fn-print-os-name() {
-  declare desc="Returns the release name of the operating system"
+fn-print-os-id() {
+  declare desc="Returns the release id of the operating system"
   local OSRELEASE="${SSHCOMMAND_OSRELEASE:="/etc/os-release"}"
-  sed -n 's#^NAME="\(.*\)"#\1#p' "$OSRELEASE" | sed 's/./\L&/g'
+  sed -n 's#^ID=\(.*\)#\1#p' "$OSRELEASE"
   return 0
 }
 
@@ -55,7 +55,7 @@ fn-adduser() {
   local l_user l_platform
 
   l_user=$1
-  l_platform="$(fn-print-os-name)"
+  l_platform="$(fn-print-os-id)"
   case $l_platform in
     debian*|ubuntu|raspbian*)
       adduser --disabled-password --gecos "" "$l_user"
