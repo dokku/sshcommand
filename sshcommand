@@ -7,9 +7,6 @@ if [[ -f /etc/defaults/sshcommand ]]; then
   source /etc/defaults/sshcommand
 fi
 
-readonly ALLOWED_KEYS="${SSHCOMMAND_ALLOWED_KEYS:="no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"}"
-readonly OSRELEASE="${SSHCOMMAND_OSRELEASE:="/etc/os-release"}"
-
 cmd-help() {
   declare desc="Shows help information for a command"
   declare args="$*"
@@ -48,6 +45,7 @@ fn-info() {
 
 fn-print-os-name() {
   declare desc="Returns the release name of the operating system"
+  local OSRELEASE="${SSHCOMMAND_OSRELEASE:="/etc/os-release"}"
   sed -n 's#^NAME="\(.*\)"#\1#p' "$OSRELEASE" | sed 's/./\L&/g'
   return 0
 }
@@ -108,7 +106,7 @@ sshcommand-create() {
 sshcommand-acl-add() {
   declare desc="Adds named SSH key to user from STDIN or argument"
   declare USER="$1" NAME="$2" KEY_FILE="$3"
-  local FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
+  local ALLOWED_KEYS FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
 
   if [[ -z "$USER" ]] || [[ -z "$NAME" ]]; then
     log-fail "Usage: sshcommand acl-add" "$(fn-args "sshcommand-acl-add")"
@@ -136,6 +134,7 @@ sshcommand-acl-add() {
     log-fail "Invalid ssh public key"
   fi
 
+  ALLOWED_KEYS="${SSHCOMMAND_ALLOWED_KEYS:="no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"}"
   KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",$ALLOWED_KEYS"
   echo "$KEY_PREFIX $KEY" >> "$USERHOME/.ssh/authorized_keys"
   echo "$FINGERPRINT"
