@@ -1,22 +1,60 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -eo pipefail; [[ $SSHCOMMAND_TRACE ]] && set -x
 
 shopt -s nocasematch #For case insensitive string matching, for the first parameter
 
-OSRELEASE=/etc/os-release
+readonly OSRELEASE=/etc/os-release
 
-f_print_os_name() {
-  sed -n 's#^NAME="\(.*\)"#\1#p' $OSRELEASE
+cmd-help() {
+  declare desc="Shows help information for a command"
+  declare args="$*"
+  if [[ "$args" ]]; then
+    for cmd; do true; done # last arg
+    local fn="sshcommand-$cmd"
+    fn-info "$fn" 1
+  fi
+}
+
+fn-args() {
+  declare desc="Inspect a function's arguments"
+  local argline
+  argline=$(type "$1" | grep declare | grep -v "declare desc" | head -1)
+  echo -e "${argline// /"\n"}" | awk -F= '/=/{print "<"$1">"}' | tr "\n" " "
+}
+
+fn-desc() {
+  declare desc="Inspect a function's description"
+  desc=""
+  eval "$(type "$1" | grep desc | head -1)"; echo $desc
+}
+
+fn-info() {
+  declare desc="Inspects a function"
+  declare fn="$1" showsource="$2"
+  local fn_name="${1//sshcommand-/}"
+  echo "$fn_name $(fn-args "$fn")"
+  echo "  $(fn-desc "$fn")"
+  echo
+  if [[ "$showsource" ]]; then
+    type "$fn" | tail -n +2
+    echo
+  fi
+}
+
+fn-print-os-name() {
+  declare desc="Returns the release name of the operating system"
+  sed -n 's#^NAME="\(.*\)"#\1#p' "$OSRELEASE" | sed 's/./\L&/g'
   return 0
 }
 
-f_adduser() {
+fn-adduser() {
+  declare desc="Add a user to the system"
   local l_user l_platform
 
   l_user=$1
-  l_platform="$(f_print_os_name)"
+  l_platform="$(fn-print-os-name)"
   case $l_platform in
-    Debian*|Ubuntu|Raspbian*)
+    debian*|ubuntu|raspbian*)
       adduser --disabled-password --gecos "" "$l_user"
       ;;
     *)
@@ -24,83 +62,124 @@ f_adduser() {
       groupadd "$l_user"
       usermod -L -aG "$l_user" "$l_user"
       ;;
-
   esac
 }
 
-case "$1" in
-  create) # sshcommand create <user> <command>
-    if [[ $# -ne 3 ]]; then
-      echo "Usage : sshcommand create user command"
-      exit -1
-    fi
-    USER="$2"; COMMAND="$3"
+log-fail() {
+  declare desc="Log fail formatter"
+  echo "$@" 1>&2
+  exit -1
+}
 
-    if id -u "$USER" >/dev/null 2>&1; then
-      echo "User '$USER' already exists"
-    else
-      f_adduser "$USER"
-    fi
+log-verbose() {
+  declare desc="Log verbose formatter"
+  if [[ ! -z "$SSHCOMMAND_VERBOSE_OUTPUT" ]]; then
+    echo "$@"
+  fi
+}
 
-    USERHOME=$(sh -c "echo ~$USER")
-    mkdir -p "$USERHOME/.ssh"
-    touch "$USERHOME/.ssh/authorized_keys"
-    echo "$COMMAND" > "$USERHOME/.sshcommand"
-    chown -R "$USER" "$USERHOME"
-    ;;
+sshcommand-create() {
+  declare desc="Creates a user forced to run command when SSH connects"
+  declare USER="$1" COMMAND="$2"
+  local USERHOME
 
-  acl-add) # sshcommand acl-add <user> <identifier>
-    if [[ $# -ne 3 ]]; then
-      echo "Usage : sshcommand acl-add user identifier"
-      exit -1
-    fi
-    USER="$2"; NAME="$3"
+  if [[ -z "$USER" ]] || [[ -z "$COMMAND" ]]; then
+    log-fail "Usage: sshcommand create" "$(fn-args "sshcommand-create")"
+  fi
 
-    getent passwd "$USER" > /dev/null || false
-    USERHOME=$(sh -c "echo ~$USER")
+  if id -u "$USER" >/dev/null 2>&1; then
+    log-verbose "User '$USER' already exists"
+  else
+    fn-adduser "$USER"
+  fi
 
-    NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
-    if [ ! -z "$NEW_KEY" ]; then
-      echo "Duplicate SSH Key name" >&2
-      exit -1
-    fi
+  USERHOME=$(sh -c "echo ~$USER")
+  mkdir -p "$USERHOME/.ssh"
+  touch "$USERHOME/.ssh/authorized_keys"
+  echo "$COMMAND" > "$USERHOME/.sshcommand"
+  chown -R "$USER" "$USERHOME"
+}
 
-    KEY_FILE=$(mktemp)
-    KEY=$(tee "$KEY_FILE")
-    delete_key_file() {
-      rm -f "$KEY_FILE"
-    }
-    trap delete_key_file INT EXIT
-    FINGERPRINT=$(ssh-keygen -lf "$KEY_FILE" | awk '{print $2}')
+sshcommand-acl-add() {
+  declare desc="Adds named SSH key to user from STDIN or argument"
+  declare USER="$1" NAME="$2"
+  local FINGERPRINT KEY KEY_FILE KEY_PREFIX NEW_KEY USERHOME
 
-    if [[ ! "$FINGERPRINT" =~ :.* ]]; then
-      echo "Invalid ssh public key"
-      exit -1
-    fi
+  if [[ -z "$USER" ]] || [[ -z "$NAME" ]]; then
+    log-fail "Usage: sshcommand acl-add" "$(fn-args "sshcommand-acl-add")"
+  fi
 
-    KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
-    echo "$KEY_PREFIX $KEY" >> "$USERHOME/.ssh/authorized_keys"
-    echo "$FINGERPRINT"
-    ;;
+  getent passwd "$USER" > /dev/null || false
+  USERHOME=$(sh -c "echo ~$USER")
 
-  acl-remove) # sshcommand acl-remove <user> <identifier>
-    if [[ $# -ne 3 ]]; then
-      echo "Usage : sshcommand acl-remove user identifier"
-      exit -1
-    fi
-    USER="$2"; NAME="$3"
+  NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
+  if [[ ! -z "$NEW_KEY" ]]; then
+    log-fail "Duplicate SSH Key name"
+  fi
 
-    getent passwd "$USER" > /dev/null || false
-    USERHOME=$(sh -c "echo ~$USER")
+  KEY_FILE=$(mktemp)
+  KEY=$(tee "$KEY_FILE")
+  delete_key_file() {
+    rm -f "$KEY_FILE"
+  }
+  trap delete_key_file INT EXIT
+  FINGERPRINT=$(ssh-keygen -lf "$KEY_FILE" | awk '{print $2}')
 
-    sed --in-place "/ NAME=\\\\\"$NAME\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
-    ;;
+  if [[ ! "$FINGERPRINT" =~ :.* ]]; then
+    log-fail "Invalid ssh public key"
+  fi
 
-  help|*) # sshcommand help
-    echo "Usage : sshcommand create user command"
-    echo "        sshcommand acl-add user identifier"
-    echo "        sshcommand acl-remove user identifier"
-    echo "        sshcommand help # shows this usage message"
-    ;;
+  KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
+  echo "$KEY_PREFIX $KEY" >> "$USERHOME/.ssh/authorized_keys"
+  echo "$FINGERPRINT"
+}
 
-esac
+sshcommand-acl-remove() {
+  declare desc="Removes SSH key by name"
+  declare USER="$1" NAME="$2"
+  local USERHOME
+
+  if [[ -z "$USER" ]] || [[ -z "$NAME" ]]; then
+    log-fail "Usage: sshcommand acl-remove" "$(fn-args "sshcommand-acl-remove")"
+  fi
+
+  getent passwd "$USER" > /dev/null || false
+  USERHOME=$(sh -c "echo ~$USER")
+
+  sed --in-place "/ NAME=\\\\\"$NAME\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
+}
+
+sshcommand-help() {
+  declare desc="Shows help information"
+  declare COMMAND="$1"
+
+  if [[ -n "$COMMAND" ]]; then
+    cmd-help "$COMMAND"
+    return 0
+  fi
+
+  echo "sshcommand"
+  echo ""
+  printf "  %-10s %-26s %s\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
+  printf "  %-10s %-26s %s\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
+  printf "  %-10s %-26s %s\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
+  printf "  %-10s %-26s %s\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
+}
+
+main() {
+  if [[ -z "$1" ]]; then
+    sshcommand-help "$@"
+    exit 1
+  fi
+
+  local cmd="sshcommand-$1"
+  shift 1
+
+  if declare -f $cmd > /dev/null; then
+    $cmd "$@"
+  else
+    log-fail "Invalid command"
+  fi
+}
+
+main "$@"

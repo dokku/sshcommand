@@ -16,11 +16,12 @@ ssh ls@server <your-args>
 
 ## Commands
 
-    $ sshcommand create <user> <command>              # creates a user forced to run command when SSH connects
-    $ sshcommand acl-add <user> <ssh-key-name>        # adds named SSH key to user from STDIN
-    $ sshcommand acl-remove <user> <ssh-key-name>     # removes SSH key by name
-    $ sshcommand help                                 # displays the usage help message
-
+```shell
+sshcommand create     <USER> <COMMAND>          # Creates a user forced to run command when SSH connects
+sshcommand acl-add    <USER> <NAME>             # Adds named SSH key to user from STDIN or argument
+sshcommand acl-remove <USER> <NAME>             # Removes SSH key by name
+sshcommand help       <COMMAND>                 # Shows help information
+```
 
 ## Example
 
