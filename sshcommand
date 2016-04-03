@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eo pipefail
 
 shopt -s nocasematch #For case insensitive string matching, for the first parameter
