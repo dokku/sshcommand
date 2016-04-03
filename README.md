@@ -49,3 +49,14 @@ to pass arguments or if your command takes subcommands, expose those subcommands
 Can be run remotely with:
 
     $ ssh cmd@server subcommand
+
+When adding an authorized key, you can also specify custom options for `AUTHORIZED_KEYS`
+by specifying the `SSHCOMMAND_ALLOWED_KEYS` environment variable. This should be a list
+of comma-separated options. The default keys are as follows:
+
+```
+no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding
+```
+
+This can be useful for cases where the ssh server does not allow certain options or you
+wish to further constrain a user's environment. Please see `man sshd` for more information.

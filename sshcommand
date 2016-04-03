@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set -eo pipefail; [[ $SSHCOMMAND_TRACE ]] && set -x
+shopt -s nocasematch # For case insensitive string matching, for the first parameter
 
-shopt -s nocasematch #For case insensitive string matching, for the first parameter
+if [[ -f /etc/defaults/sshcommand ]]; then
+  # shellcheck disable=SC1091
+  source /etc/defaults/sshcommand
+fi
 
-readonly OSRELEASE=/etc/os-release
+readonly ALLOWED_KEYS="${SSHCOMMAND_ALLOWED_KEYS:="no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"}"
+readonly OSRELEASE="${SSHCOMMAND_OSRELEASE:="/etc/os-release"}"
 
 cmd-help() {
   declare desc="Shows help information for a command"
@@ -131,7 +136,7 @@ sshcommand-acl-add() {
     log-fail "Invalid ssh public key"
   fi
 
-  KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
+  KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",$ALLOWED_KEYS"
   echo "$KEY_PREFIX $KEY" >> "$USERHOME/.ssh/authorized_keys"
   echo "$FINGERPRINT"
 }

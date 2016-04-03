@@ -23,6 +23,16 @@ check_authorized_keys_entry() {
   assert_output "NAME=\\\"$ENTRY_ID\\\""
 }
 
+check_custom_allowed_keys() {
+  local ALLOWED_KEYS="$1"
+
+  run bash -c "grep ${ALLOWED_KEYS} /home/${TEST_USER}/.ssh/authorized_keys"
+  echo "entry: " $(cat /home/${TEST_USER}/.ssh/authorized_keys)
+  echo "output: "$output
+  echo "status: "$status
+  assert_success
+}
+
 @test "(core) sshcommand create" {
   delete_user
 
@@ -72,6 +82,24 @@ check_authorized_keys_entry() {
 
   check_authorized_keys_entry $TEST_KEY_NAME user1
   check_authorized_keys_entry new_key user2
+}
+
+@test "(core) sshcommand acl-add (custom allowed keys)" {
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | SSHCOMMAND_ALLOWED_KEYS=keys-user1 sshcommand acl-add $TEST_USER user1"
+  echo "output: "$output
+  echo "status: "$status
+  assert_success
+
+  create_test_key new_key
+  run bash -c "cat ${TEST_KEY_DIR}/new_key.pub | sshcommand acl-add $TEST_USER user2"
+  echo "output: "$output
+  echo "status: "$status
+  assert_success
+
+  check_authorized_keys_entry $TEST_KEY_NAME user1
+  check_authorized_keys_entry new_key user2
+  check_custom_allowed_keys keys-user1
+  check_custom_allowed_keys no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding
 }
 
 @test "(core) sshcommand acl-add (bad key failure)" {
