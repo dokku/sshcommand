@@ -7,6 +7,7 @@ if [[ -f /etc/defaults/sshcommand ]]; then
   source /etc/defaults/sshcommand
 fi
 
+readonly ALLOWED_KEYS="${SSHCOMMAND_ALLOWED_KEYS:="no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"}"
 readonly OSRELEASE="${SSHCOMMAND_OSRELEASE:="/etc/os-release"}"
 
 cmd-help() {
@@ -135,7 +136,7 @@ sshcommand-acl-add() {
     log-fail "Invalid ssh public key"
   fi
 
-  KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"
+  KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",$ALLOWED_KEYS"
   echo "$KEY_PREFIX $KEY" >> "$USERHOME/.ssh/authorized_keys"
   echo "$FINGERPRINT"
 }
