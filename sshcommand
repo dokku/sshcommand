@@ -79,7 +79,7 @@ sshcommand-acl-add() {
 
   NEW_KEY=$(grep "NAME=\\\\\"$IDENTIFIER"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
   if [[ ! -z "$NEW_KEY" ]]; then
-    log-fail "Duplicate SSH Key name" >&2
+    log-fail "Duplicate SSH Key name"
     exit -1
   fi
 
