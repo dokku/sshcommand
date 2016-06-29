@@ -90,7 +90,7 @@ log-verbose() {
 }
 
 sshcommand-create() {
-  declare desc="Creates a user forced to run command when SSH connects"
+  declare desc="Creates a local system user and installs sshcommand skeleton"
   declare USER="$1" COMMAND="$2"
   local USERHOME
 
@@ -163,6 +163,19 @@ sshcommand-acl-remove() {
   sed --in-place "/ NAME=\\\\\"$NAME\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
 }
 
+sshcommand-list() {
+  declare desc="Lists SSH user keys by name"
+  declare userhome USER="$1"
+  [[ -z "$USER" ]] && log-fail "Usage: sshcommand list" "$(fn-args "sshcommand-list")"
+
+  getent passwd "$USER" > /dev/null || log-fail "\"$USER\" is not a user on this system"
+  userhome=$(sh -c "echo ~$USER")
+  [[ -e "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys not found for $USER"
+  [[ -s "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys is empty for $USER"
+  grep -oE '[a-f0-9]{2}(:[a-f0-9]{2}){15}\ NAME=\\".*\\"|SSH_ORIGINAL_COMMAND\",[a-zA-Z0-9,\-]*' "$userhome/.ssh/authorized_keys" | \
+    sed -e 's/\\//g' -e 's/SSH_ORIGINAL_COMMAND",/ SSHCOMMAND_ALLOWED_KEYS: /g'
+}
+
 sshcommand-help() {
   declare desc="Shows help information"
   declare COMMAND="$1"
@@ -174,10 +187,11 @@ sshcommand-help() {
 
   echo "sshcommand"
   echo ""
-  printf "  %-10s %-26s %s\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
-  printf "  %-10s %-26s %s\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
-  printf "  %-10s %-26s %s\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
-  printf "  %-10s %-26s %s\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
+  printf "  %-10s %-30s %s\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
+  printf "  %-10s %-30s %s\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
+  printf "  %-10s %-30s %s\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
+  printf "  %-10s %-30s %s\n" "list"       "$(fn-args "sshcommand-list")"       "$(fn-desc "sshcommand-list")"
+  printf "  %-10s %-30s %s\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
 }
 
 main() {
