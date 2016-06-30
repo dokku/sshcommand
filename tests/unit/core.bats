@@ -153,9 +153,26 @@ check_custom_allowed_keys() {
   assert_failure
 }
 
+@test "(core) sshcommand list" {
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER user1"
+  echo "output: "$output
+  echo "status: "$status
+  assert_success
+
+  run bash -c "sshcommand list ${TEST_USER} | grep $(ssh-keygen -l -f /home/${TEST_USER}/.ssh/authorized_keys | grep -oE '[a-f0-9]{2}(:[a-f0-9]{2}){15}')"
+  echo "output: "$output
+  echo "status: "$status
+  assert_success
+
+  run bash -c "sshcommand acl-remove $TEST_USER user1 && sshcommand list"
+  echo "output: "$output
+  echo "status: "$status
+  assert_failure
+}
+
 @test "(core) sshcommand help" {
   run bash -c "sshcommand help | wc -l"
   echo "output: "$output
   echo "status: "$status
-  [[ "$output" -ge 4 ]]
+  [[ "$output" -ge 7 ]]
 }
