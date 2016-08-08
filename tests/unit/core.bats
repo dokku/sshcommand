@@ -159,7 +159,7 @@ check_custom_allowed_keys() {
   echo "status: "$status
   assert_success
 
-  run bash -c "sshcommand list ${TEST_USER} | grep $(ssh-keygen -l -f /home/${TEST_USER}/.ssh/authorized_keys | grep -oE '[a-f0-9]{2}(:[a-f0-9]{2}){15}')"
+  run bash -c "sshcommand list ${TEST_USER} | grep $(ssh-keygen -l -f /home/${TEST_USER}/.ssh/authorized_keys | awk '{print $2}')"
   echo "output: "$output
   echo "status: "$status
   assert_success
