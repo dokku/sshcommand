@@ -1,4 +1,4 @@
-FROM gcc:latest
+FROM gcc:6.1
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 
