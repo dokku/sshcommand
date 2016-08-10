@@ -154,15 +154,14 @@ check_custom_allowed_keys() {
 }
 
 @test "(core) sshcommand list" {
-  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER user1"
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | SSHCOMMAND_ALLOWED_KEYS=keys-user1 sshcommand acl-add $TEST_USER user1"
   echo "output: "$output
   echo "status: "$status
   assert_success
 
-  run bash -c "sshcommand list ${TEST_USER} | grep $(ssh-keygen -l -f /home/${TEST_USER}/.ssh/authorized_keys | awk '{print $2}')"
-  echo "output: "$output
-  echo "status: "$status
-  assert_success
+  assert_equal \
+    "$(ssh-keygen -l -f /home/${TEST_USER}/.ssh/authorized_keys | awk '{print $2}') NAME=\"user1\" SSHCOMMAND_ALLOWED_KEYS=\"keys-user1\"" \
+    "$(sshcommand list ${TEST_USER})"
 
   run bash -c "sshcommand acl-remove $TEST_USER user1 && sshcommand list"
   echo "output: "$output

@@ -172,8 +172,7 @@ sshcommand-list() {
   userhome=$(sh -c "echo ~$USER")
   [[ -e "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys not found for $USER"
   [[ -s "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys is empty for $USER"
-  grep -oE '[a-f0-9]{2}(:[a-f0-9]{2}){15}\ NAME=\\".*\\"|SSH_ORIGINAL_COMMAND\",[a-zA-Z0-9,\-]*' "$userhome/.ssh/authorized_keys" | \
-    sed -e 's/\\//g' -e 's/SSH_ORIGINAL_COMMAND",/ SSHCOMMAND_ALLOWED_KEYS: /g'
+  sed --silent --regexp-extended 's/^command="FINGERPRINT=(\S+) NAME=\\"(.*?)\\".*?",(\S+).*/\1 NAME="\2" SSHCOMMAND_ALLOWED_KEYS="\3"/p' "$userhome/.ssh/authorized_keys"
 }
 
 sshcommand-help() {
