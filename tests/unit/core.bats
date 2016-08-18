@@ -169,6 +169,15 @@ check_custom_allowed_keys() {
   assert_failure
 }
 
+@test "(core) sshcommand list (authorized_keys format variants)" {
+  cp tests/unit/fixtures/authorized_keys/input_variants /home/${TEST_USER}/.ssh/authorized_keys
+  run sshcommand list ${TEST_USER}
+  assert_equal \
+    "$(cat tests/unit/fixtures/authorized_keys/sshcommand_list_expected_output)" \
+    "$(sshcommand list ${TEST_USER})"
+  rm /home/${TEST_USER}/.ssh/authorized_keys
+}
+
 @test "(core) sshcommand help" {
   run bash -c "sshcommand help | wc -l"
   echo "output: "$output
