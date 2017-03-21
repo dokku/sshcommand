@@ -136,6 +136,10 @@ sshcommand-acl-add() {
     KEY=$(cat "$KEY_FILE")
   fi
 
+  local count
+  count="$(wc -l <<< "$KEY")"
+  [[ "$count" -eq 1 ]] || log-fail "Too many keys provided, set one per invocation of sshcommand acl-add <USER> <NAME>"
+
   FINGERPRINT=$(ssh-keygen -lf "$KEY_FILE" | awk '{print $2}')
 
   if [[ ! "$FINGERPRINT" =~ :.* ]]; then
