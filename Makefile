@@ -1,7 +1,7 @@
 .PHONY: ci-dependencies shellcheck bats install lint unit-tests test build-test-container test-in-docker
 SYSTEM := $(shell sh -c 'uname -s 2>/dev/null')
 NAME = sshcommand
-VERSION = 0.6.0
+VERSION = 0.7.0
 
 ci-dependencies: shellcheck bats
 

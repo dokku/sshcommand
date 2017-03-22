@@ -11,6 +11,14 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 
+## [0.7.0] - 2017-03-22
+### Fixed
+- @callahad  Only allow one key per file in acl-add. Otherwise, the additional keys get added without the sshcommand wrapper.
+
+### Added
+- @michaelshobbs automated releases
+
+
 ## [0.6.0] - 2016-08-26
 ### Fixed
 - @IlyaSemenov Fixed failing unit test for sshcommand list
