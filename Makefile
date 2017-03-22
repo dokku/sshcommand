@@ -1,5 +1,7 @@
 .PHONY: ci-dependencies shellcheck bats install lint unit-tests test build-test-container test-in-docker
 SYSTEM := $(shell sh -c 'uname -s 2>/dev/null')
+NAME = sshcommand
+VERSION = 0.6.0
 
 ci-dependencies: shellcheck bats
 
@@ -51,3 +53,12 @@ ifneq ($(shell docker inspect sshcommand_test > /dev/null 2>&1 ; echo $$?),0)
 	$(MAKE) build-test-container
 endif
 	docker run -ti --rm -v ${PWD}:/app -w /app --hostname='box223' sshcommand_test make ci-dependencies install test
+
+deps:
+	go get -u github.com/progrium/gh-release/...
+
+release: deps
+	rm -rf release && mkdir release
+	tar -zcf release/$(NAME)_$(VERSION).tgz .
+	gh-release create dokku/$(NAME) $(VERSION) \
+		$(shell git rev-parse --abbrev-ref HEAD) v$(VERSION)

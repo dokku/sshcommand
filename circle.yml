@@ -5,3 +5,9 @@ dependencies:
 test:
   override:
     - sudo make -e test
+
+deployment:
+  release:
+    branch: release
+    commands:
+      - make release
