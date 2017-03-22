@@ -118,6 +118,14 @@ check_custom_allowed_keys() {
   check_authorized_keys_entry $TEST_KEY_NAME 'broken user'
 }
 
+@test "(core) sshcommand acl-add (multiple keys)" {
+  create_test_key second_key
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub ${TEST_KEY_DIR}/second_key.pub | sshcommand acl-add $TEST_USER user1"
+  echo "output: "$output
+  echo "status: "$status
+  assert_failure
+}
+
 @test "(core) sshcommand acl-add (duplicate key)" {
   run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER user1"
   echo "output: "$output
