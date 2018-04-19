@@ -68,6 +68,10 @@ fn-adduser() {
     debian*|ubuntu|raspbian*)
       adduser --disabled-password --gecos "" "$l_user"
       ;;
+    arch)
+      useradd -m -s /bin/bash "$l_user"
+      usermod -L -aG "$l_user" "$l_user"
+      ;;
     *)
       useradd -m -s /bin/bash "$l_user"
       groupadd "$l_user"
