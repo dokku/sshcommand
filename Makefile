@@ -19,8 +19,11 @@ else
 endif
 
 version:
+	@sed -i.bak 's/SSHCOMMAND_VERSION=""/SSHCOMMAND_VERSION="$(VERSION)"/' sshcommand && rm sshcommand.bak
 	@echo "$(CIRCLE_BRANCH)"
 	@echo "$(VERSION)"
+	@./sshcommand version
+
 
 define PACKAGE_DESCRIPTION
 Turn SSH into a thin client specifically for your app
