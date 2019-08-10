@@ -6,26 +6,27 @@ VERSION = 0.7.0
 ci-dependencies: shellcheck bats
 
 shellcheck:
-ifneq ($(shell shellcheck --version > /dev/null 2>&1 ; echo $$?),0)
+ifneq ($(shell shellcheck --version >/dev/null 2>&1 ; echo $$?),0)
 ifeq ($(SYSTEM),Darwin)
 	brew install shellcheck
 else
 	sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse'
-	sudo apt-get update && sudo -E apt-get install -y -qq shellcheck
+	sudo rm -rf /var/lib/apt/lists/* && sudo apt-get clean
+	sudo apt-get update -qq && sudo apt-get install -qq -y shellcheck
 endif
 endif
 
 bats:
-ifneq ($(shell bats --version > /dev/null 2>&1 ; echo $$?),0)
 ifeq ($(SYSTEM),Darwin)
-	brew install bats
+ifneq ($(shell bats --version >/dev/null 2>&1 ; echo $$?),0)
+	brew install bats-core
+endif
 else
-	sudo mkdir -p /usr/local
-	git clone https://github.com/sstephenson/bats.git /tmp/bats
+	git clone https://github.com/josegonzalez/bats-core.git /tmp/bats
 	cd /tmp/bats && sudo ./install.sh /usr/local
 	rm -rf /tmp/bats
 endif
-endif
+
 
 install:
 	@echo setting up...
@@ -40,7 +41,8 @@ lint:
 
 unit-tests:
 	@echo running unit tests...
-	@$(QUIET) bats tests/unit
+	@mkdir -p test-results/bats
+	@$(QUIET) TERM=linux bats --formatter bats-format-junit -e -T -o test-results/bats tests/unit
 
 test: lint unit-tests
 
