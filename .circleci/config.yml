@@ -6,16 +6,20 @@ jobs:
     steps:
       - checkout
       - run:
+          name: dependencies
           command: |
             make -e ci-dependencies
             sudo make -e install
       - run:
+          name: tests
           command: |
             sudo make -e test
       - run:
+          name: tests (in docker)
           command: |
             make -e test-in-docker
       - run:
+          name: release
           command: |
             if [[ "$CIRCLE_BRANCH" == "release" ]]; then
               make release
