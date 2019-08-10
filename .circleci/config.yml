@@ -14,9 +14,6 @@ jobs:
           name: tests
           command: |
             sudo make -e test
-      - run:
-          name: tests (in docker)
-          command: |
             make -e test-in-docker
       - run:
           name: release
