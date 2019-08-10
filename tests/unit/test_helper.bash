@@ -98,7 +98,7 @@ create_user() {
 }
 
 delete_user() {
-  deluser --remove-home $TEST_USER
+  userdel --remove $TEST_USER
 }
 
 create_test_key() {
