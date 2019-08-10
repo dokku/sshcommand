@@ -14,6 +14,9 @@ jobs:
             sudo make -e test
       - run:
           command: |
+            make -e test-in-docker
+      - run:
+          command: |
             if [[ "$CIRCLE_BRANCH" == "release" ]]; then
               make release
             fi
