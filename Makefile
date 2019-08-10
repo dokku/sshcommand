@@ -73,6 +73,7 @@ build/linux/$(NAME):
 	cp -f sshcommand build/linux/sshcommand
 
 build/deb/$(NAME)_$(VERSION)_amd64.deb: build/linux/$(NAME)
+	chmod 644 LICENSE
 	export SOURCE_DATE_EPOCH=$(shell git log -1 --format=%ct) \
 		&& mkdir -p build/deb \
 		&& fpm \
@@ -93,6 +94,7 @@ build/deb/$(NAME)_$(VERSION)_amd64.deb: build/linux/$(NAME)
 		LICENSE=/usr/share/doc/$(NAME)/copyright
 
 build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm: build/linux/$(NAME)
+	chmod 644 LICENSE
 	export SOURCE_DATE_EPOCH=$(shell git log -1 --format=%ct) \
 		&& mkdir -p build/rpm \
 		&& fpm \
