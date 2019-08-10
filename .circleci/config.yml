@@ -18,7 +18,7 @@ jobs:
           command: |
             make build-in-docker
             [[ -d build ]]  && sudo chown -R circleci:circleci build
-      - run: make validate-in-docker test-in-docker
+      - run: make validate-in-docker
       - store_artifacts:
           path: build
           destination: build

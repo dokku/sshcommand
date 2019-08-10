@@ -1,4 +1,4 @@
-.PHONY: ci-dependencies shellcheck bats install lint unit-tests test build-test-container test-in-docker
+.PHONY: ci-dependencies shellcheck bats install lint unit-tests test
 NAME = sshcommand
 EMAIL = sshcommand@josediazgonzalez.com
 MAINTAINER = dokku
@@ -120,10 +120,6 @@ circleci:
 	docker version
 	rm -f ~/.gitconfig
 
-docker-image:
-	docker build --rm -q -f Dockerfile.hub -t $(IMAGE_NAME):$(DOCKER_IMAGE_VERSION) .
-	docker tag $(IMAGE_NAME):$(DOCKER_IMAGE_VERSION) $(IMAGE_NAME):hub
-
 bin/gh-release:
 	mkdir -p bin
 	curl -o bin/gh-release.tgz -sL https://github.com/progrium/gh-release/releases/download/v2.2.1/gh-release_2.2.1_$(SYSTEM_NAME)_$(HARDWARE).tgz
@@ -188,19 +184,9 @@ pre-build:
 	true
 
 /usr/local/bin/sshcommand:
-	@echo installing...
+	@echo installing sshcommand
 	cp ./sshcommand /usr/local/bin/sshcommand
 	chmod +x /usr/local/bin/sshcommand
-
-test-in-docker:
-ifneq ($(shell docker inspect sshcommand_test > /dev/null 2>&1 ; echo $$?),0)
-	$(MAKE) build-test-container
-endif
-	docker run -ti --rm -v ${PWD}:/app -w /app --hostname='box223' sshcommand_test make test
-
-build-test-container:
-	@echo building test container...
-	docker build -t sshcommand_test -f Dockerfile.test .
 
 shellcheck:
 ifneq ($(shell shellcheck --version >/dev/null 2>&1 ; echo $$?),0)
