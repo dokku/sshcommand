@@ -7,6 +7,8 @@ if [[ -f /etc/defaults/sshcommand ]]; then
   source /etc/defaults/sshcommand
 fi
 
+declare SSHCOMMAND_VERSION=""
+
 cmd-help() {
   declare desc="Shows help information for a command"
   declare args="$*"
@@ -194,13 +196,19 @@ sshcommand-help() {
     return 0
   fi
 
-  echo "sshcommand"
+  echo "sshcommand ${SSHCOMMAND_VERSION}"
   echo ""
   printf "  %-10s %-30s %s\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
   printf "  %-10s %-30s %s\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
   printf "  %-10s %-30s %s\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
   printf "  %-10s %-30s %s\n" "list"       "$(fn-args "sshcommand-list")"       "$(fn-desc "sshcommand-list")"
   printf "  %-10s %-30s %s\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
+  printf "  %-10s %-30s %s\n" "version"    "$(fn-args "sshcommand-version")"    "$(fn-desc "sshcommand-version")"
+}
+
+sshcommand-version() {
+  declare desc="Shows version"
+  echo "sshcommand ${SSHCOMMAND_VERSION}"
 }
 
 main() {

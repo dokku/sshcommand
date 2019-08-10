@@ -22,6 +22,7 @@ sshcommand acl-add    <USER> <NAME> <KEY_FILE>  # Adds named SSH key to user fro
 sshcommand acl-remove <USER> <NAME>             # Removes SSH key by name
 sshcommand list       <USER>                    # Lists SSH user keys by name
 sshcommand help       <COMMAND>                 # Shows help information
+sshcommand version                              # Shows version
 ```
 
 ## Example
