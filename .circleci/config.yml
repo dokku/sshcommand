@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    machine:
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run:
+          command: |
+            make -e ci-dependencies
+            sudo make -e install
+      - run:
+          command: |
+            sudo make -e test
+      - run:
+          command: |
+            if [[ "$CIRCLE_BRANCH" == "release" ]]; then
+              make release
+            fi
