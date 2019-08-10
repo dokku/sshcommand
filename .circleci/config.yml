@@ -6,18 +6,25 @@ jobs:
     steps:
       - checkout
       - run:
-          name: dependencies
           command: |
-            make -e ci-dependencies
-            sudo make -e install
+            make version
+            if [[ "$CIRCLE_BRANCH" == "release" ]]; then
+              export PACKAGECLOUD_REPOSITORY=dokku/dokku
+              make .env.docker
+            fi
+      - run: make circleci
+      - run: make build-docker-image
       - run:
-          name: tests
           command: |
-            sudo make -e test
-            make -e test-in-docker
+            make build-in-docker
+            [[ -d build ]]  && sudo chown -R circleci:circleci build
+      - run: make validate-in-docker test-in-docker
+      - store_artifacts:
+          path: build
+          destination: build
       - run:
-          name: release
           command: |
             if [[ "$CIRCLE_BRANCH" == "release" ]]; then
-              make release
+              make release-in-docker
             fi
+            make release-packagecloud-in-docker
