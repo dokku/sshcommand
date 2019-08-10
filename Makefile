@@ -184,6 +184,9 @@ unit-tests: /usr/local/bin/sshcommand
 	@mkdir -p test-results/bats
 	@$(QUIET) TERM=linux bats --formatter bats-format-junit -e -T -o test-results/bats tests/unit
 
+pre-build:
+	true
+
 /usr/local/bin/sshcommand:
 	@echo installing...
 	cp ./sshcommand /usr/local/bin/sshcommand
