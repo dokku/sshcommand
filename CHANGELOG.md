@@ -10,6 +10,16 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.8.0] - 2019-08-10
+### Fixed
+- @fruitl00p delete_user is now portable
+
+### Added
+- @D1ceWard Added arch linux support
+- @josegonzalez Move to circleci 2.0
+- @josegonzalez Run tests in docker
+- @josegonzalez Release packages via CI
+- @josegonzalez Add version command
 
 ## [0.7.0] - 2017-03-22
 ### Fixed
@@ -103,7 +113,9 @@ All notable changes to this project will be documented in this file.
 - @michaelshobbs update build image in README
 - @jvanbaarsen Only add SSH key if it doesn't already exists
 
-[unreleased]: https://github.com/dokku/sshcommand/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/dokku/sshcommand/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/dokku/sshcommand/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/dokku/sshcommand/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/dokku/sshcommand/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/dokku/sshcommand/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/dokku/sshcommand/compare/v0.3.0...v0.4.0

@@ -22,6 +22,12 @@ load test_helper
   echo "status: "$status
   assert_output "alpine"
   assert_success
+
+  SSHCOMMAND_OSRELEASE=$BATS_TEST_DIRNAME/fixtures/os/arch-os-release run "fn-print-os-id"
+  echo "output: "$output
+  echo "status: "$status
+  assert_output "arch"
+  assert_success
 }
 
 @test "(fn) print-os-id (invalid path)" {
