@@ -175,6 +175,12 @@ check_custom_allowed_keys() {
   echo "output: "$output
   echo "status: "$status
   assert_failure
+
+  cp tests/unit/fixtures/authorized_keys/input_variants /home/${TEST_USER}/.ssh/authorized_keys
+  run sshcommand list ${TEST_USER} md5
+  assert_equal \
+    "$(cat tests/unit/fixtures/authorized_keys/sshcommand_list_expected_output | head -n1)" \
+    "$(sshcommand list ${TEST_USER} md5)"
 }
 
 @test "(core) sshcommand list (authorized_keys format variants)" {
