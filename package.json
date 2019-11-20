@@ -1,6 +1,6 @@
 {
   "name": "sshcommand",
-  "version": "0.0.1",
+  "version": "0.9.0",
   "description": "Turn SSH into a thin client specifically for your app",
   "global": "true",
   "install": "cp sshcommand /usr/local/bin && chmod +x /usr/local/bin/sshcommand",

@@ -20,7 +20,7 @@ ssh ls@server <your-args>
 sshcommand create     <USER> <COMMAND>          # Creates a user forced to run command when SSH connects
 sshcommand acl-add    <USER> <NAME> <KEY_FILE>  # Adds named SSH key to user from STDIN or argument
 sshcommand acl-remove <USER> <NAME>             # Removes SSH key by name
-sshcommand list       <USER>                    # Lists SSH user keys by name
+sshcommand list       <USER> [<NAME>]           # Lists SSH keys by user and an optional name
 sshcommand help       <COMMAND>                 # Shows help information
 sshcommand version                              # Shows version
 ```
