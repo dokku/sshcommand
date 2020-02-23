@@ -175,7 +175,7 @@ sshcommand-acl-remove() {
 
 sshcommand-list() {
   declare desc="Lists SSH keys by user, an optional name and a optional output format (JSON)"
-  declare userhome USER="$1" NAME="$2" OUTPUT_TYPE="${3:-2}"
+  declare userhome USER="$1" NAME="$2" OUTPUT_TYPE="${3:-$2}"
   [[ -z "$USER" ]] && log-fail "Usage: sshcommand list" "$(fn-args "sshcommand-list")"
 
   getent passwd "$USER" > /dev/null || log-fail "\"$USER\" is not a user on this system"
