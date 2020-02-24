@@ -192,6 +192,16 @@ check_custom_allowed_keys() {
   rm /home/${TEST_USER}/.ssh/authorized_keys
 }
 
+@test "(core) sshcommand list (json output)" {
+  cp tests/unit/fixtures/authorized_keys/input_variants /home/${TEST_USER}/.ssh/authorized_keys
+  run sshcommand list ${TEST_USER} json
+
+  assert_equal \
+    "$(cat tests/unit/fixtures/authorized_keys/sshcommand_list_expected_json_output)" \
+    "$(sshcommand list ${TEST_USER} json)"
+  rm /home/${TEST_USER}/.ssh/authorized_keys
+}
+
 @test "(core) sshcommand help" {
   run bash -c "sshcommand help | wc -l"
   echo "output: "$output
