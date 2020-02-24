@@ -188,11 +188,7 @@ sshcommand-list() {
       's/^command="FINGERPRINT=(\S+) NAME=(\\"|)(.*)\2 `.*",(\S+).*/{ "fingerprint": "\1", "name": "\3", "SSHCOMMAND_ALLOWED_KEYS": "\4" }/p' \
       "$userhome/.ssh/authorized_keys" | tr '\n' ',' | sed '$s/,$/\n/')
 
-    if command -v jq >/dev/null 2>&1; then
-      echo "[${data}]" | jq -r;
-    else
-      echo "[${data}]";
-    fi
+    echo "[${data}]";
   else
     OUTPUT="$(sed --silent --regexp-extended \
         's/^command="FINGERPRINT=(\S+) NAME=(\\"|)(.*)\2 `.*",(\S+).*/\1 NAME="\3" SSHCOMMAND_ALLOWED_KEYS="\4"/p' \
