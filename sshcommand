@@ -51,7 +51,7 @@ fn-print-os-id() {
   declare desc="Returns the release id of the operating system"
   local OSRELEASE="${SSHCOMMAND_OSRELEASE:="/etc/os-release"}"
   if [[ -f $OSRELEASE ]]; then
-    sed -n 's#^ID=\(.*\)#\1#p' "$OSRELEASE"
+    sed -n 's#^ID=\(.*\)#\1#p' "$OSRELEASE" | tr -d '"'
   else
     echo unknown
   fi
@@ -72,7 +72,7 @@ fn-adduser() {
     debian*|ubuntu|raspbian*)
       adduser --disabled-password --gecos "" "$l_user"
       ;;
-    arch)
+    arch|amzn)
       useradd -m -s /bin/bash "$l_user"
       usermod -L -aG "$l_user" "$l_user"
       ;;

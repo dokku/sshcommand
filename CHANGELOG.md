@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - @Filipe-Souza Ability to output JSON format in ssh keys list
+- @matthewmueller Add support for Amazon Linux 2
 
 ### Changed
 - @josegonzalez Drop unsupported debian-based operating systems
