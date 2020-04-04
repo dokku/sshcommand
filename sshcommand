@@ -9,6 +9,7 @@ fi
 
 declare SSHCOMMAND_VERSION=""
 declare SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT=${SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT:="true"}
+declare SSHCOMMAND_CHECK_DUPLICATE_NAME=${SSHCOMMAND_CHECK_DUPLICATE_NAME:="true"}
 
 cmd-help() {
   declare desc="Shows help information for a command"
@@ -131,7 +132,7 @@ sshcommand-acl-add() {
   USERHOME=$(sh -c "echo ~$USER")
 
   NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
-  if [[ ! -z "$NEW_KEY" ]]; then
+  if [[ "$SSHCOMMAND_CHECK_DUPLICATE_NAME" == "true" ]] && [[ ! -z "$NEW_KEY" ]]; then
     log-fail "Duplicate ssh key name"
   fi
 
