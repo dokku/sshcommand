@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - @josegonzalez Do not allow users to re-specify an ssh key under a different name
 - @josegonzalez Allow user to disable name check when adding a new ssh key
+- @josegonzalez Correct shellcheck issues with shellcheck 0.7.0
 
 ## [0.9.0] - 2019-09-20
 

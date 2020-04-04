@@ -87,12 +87,12 @@ fn-adduser() {
 log-fail() {
   declare desc="Log fail formatter"
   echo "$@" 1>&2
-  exit -1
+  exit 1
 }
 
 log-verbose() {
   declare desc="Log verbose formatter"
-  if [[ ! -z "$SSHCOMMAND_VERBOSE_OUTPUT" ]]; then
+  if [[ -n "$SSHCOMMAND_VERBOSE_OUTPUT" ]]; then
     echo "$@"
   fi
 }
@@ -132,7 +132,7 @@ sshcommand-acl-add() {
   USERHOME=$(sh -c "echo ~$USER")
 
   NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
-  if [[ "$SSHCOMMAND_CHECK_DUPLICATE_NAME" == "true" ]] && [[ ! -z "$NEW_KEY" ]]; then
+  if [[ "$SSHCOMMAND_CHECK_DUPLICATE_NAME" == "true" ]] && [[ -n "$NEW_KEY" ]]; then
     log-fail "Duplicate ssh key name"
   fi
 
@@ -240,7 +240,7 @@ main() {
   local cmd="sshcommand-$1"
   shift 1
 
-  if declare -f $cmd > /dev/null; then
+  if declare -f "$cmd" > /dev/null; then
     $cmd "$@"
   else
     log-fail "Invalid command"
