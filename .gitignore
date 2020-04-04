@@ -1,1 +1,3 @@
 sshcommand.bak
+.env*
+test-results

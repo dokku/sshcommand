@@ -25,7 +25,7 @@ fn-args() {
   declare desc="Inspect a function's arguments"
   local argline
   argline=$(type "$1" | grep declare | grep -v "declare desc" | head -1)
-  echo -e "${argline// /"\n"}" | awk -F= '/=/{print "<"$1">"}' | tr "\n" " "
+  echo -e "${argline// /"\\n"}" | awk -F= '/=/{print "<"$1">"}' | tr "\\n" " "
 }
 
 fn-desc() {
@@ -218,12 +218,12 @@ sshcommand-help() {
 
   echo "sshcommand ${SSHCOMMAND_VERSION}"
   echo ""
-  printf "  %-10s %-30s %s\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
-  printf "  %-10s %-30s %s\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
-  printf "  %-10s %-30s %s\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
-  printf "  %-10s %-30s %s\n" "list"       "$(fn-args "sshcommand-list")"       "$(fn-desc "sshcommand-list")"
-  printf "  %-10s %-30s %s\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
-  printf "  %-10s %-30s %s\n" "version"    "$(fn-args "sshcommand-version")"    "$(fn-desc "sshcommand-version")"
+  printf "  %-10s %-30s %s\\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
+  printf "  %-10s %-30s %s\\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
+  printf "  %-10s %-30s %s\\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
+  printf "  %-10s %-30s %s\\n" "list"       "$(fn-args "sshcommand-list")"       "$(fn-desc "sshcommand-list")"
+  printf "  %-10s %-30s %s\\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
+  printf "  %-10s %-30s %s\\n" "version"    "$(fn-args "sshcommand-version")"    "$(fn-desc "sshcommand-version")"
 }
 
 sshcommand-version() {

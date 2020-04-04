@@ -198,7 +198,7 @@ check_custom_allowed_keys() {
   echo "status: $status"
   assert_equal \
     "$(head -n1 tests/unit/fixtures/authorized_keys/sshcommand_list_expected_json_output)" \
-    "$(sshcommand list "$TEST_USER" md5)"
+    "$(sshcommand list "$TEST_USER" md5 json)"
 }
 
 @test "(core) sshcommand list (authorized_keys format variants)" {
