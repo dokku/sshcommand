@@ -148,7 +148,7 @@ sshcommand-acl-add() {
   count="$(wc -l <<< "$KEY")"
   [[ "$count" -eq 1 ]] || log-fail "Too many keys provided, set one per invocation of sshcommand acl-add <USER> <NAME>"
 
-  FINGERPRINT=$(ssh-keygen -lf "$KEY_FILE" | awk '{print $2}')
+  FINGERPRINT=$(ssh-keygen -lf <(echo "command=\"dummy to fail when options already exist\" $KEY") | awk '{print $2}')
 
   if [[ ! "$FINGERPRINT" =~ :.* ]]; then
     log-fail "Invalid ssh public key"
