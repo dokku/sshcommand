@@ -10,6 +10,22 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.10.0] - 2020-04-03
+
+### Added
+- @Filipe-Souza Ability to output JSON format in ssh keys list
+- @matthewmueller Add support for Amazon Linux 2
+
+### Changed
+- @josegonzalez Drop unsupported debian-based operating systems
+- @josegonzalez Do not release to the betafish channel
+
+### Fixed
+- @josegonzalez Do not allow users to re-specify an ssh key under a different name
+- @josegonzalez Allow user to disable name check when adding a new ssh key
+- @josegonzalez Correct shellcheck issues with shellcheck 0.7.0
+- @znz Ignore options in key file
+
 ## [0.9.0] - 2019-09-20
 
 ### Added
@@ -28,7 +44,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.7.0] - 2017-03-22
 ### Fixed
-- @callahad  Only allow one key per file in acl-add. Otherwise, the additional keys get added without the sshcommand wrapper.
+- @callahad Only allow one key per file in acl-add. Otherwise, the additional keys get added without the sshcommand wrapper.
 
 ### Added
 - @michaelshobbs automated releases
@@ -118,7 +134,8 @@ All notable changes to this project will be documented in this file.
 - @michaelshobbs update build image in README
 - @jvanbaarsen Only add SSH key if it doesn't already exists
 
-[unreleased]: https://github.com/dokku/sshcommand/compare/v0.9.0...HEAD
+[unreleased]: https://github.com/dokku/sshcommand/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/dokku/sshcommand/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/dokku/sshcommand/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/dokku/sshcommand/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/dokku/sshcommand/compare/v0.6.0...v0.7.0

@@ -8,6 +8,8 @@ if [[ -f /etc/defaults/sshcommand ]]; then
 fi
 
 declare SSHCOMMAND_VERSION=""
+declare SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT=${SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT:="true"}
+declare SSHCOMMAND_CHECK_DUPLICATE_NAME=${SSHCOMMAND_CHECK_DUPLICATE_NAME:="true"}
 
 cmd-help() {
   declare desc="Shows help information for a command"
@@ -23,7 +25,7 @@ fn-args() {
   declare desc="Inspect a function's arguments"
   local argline
   argline=$(type "$1" | grep declare | grep -v "declare desc" | head -1)
-  echo -e "${argline// /"\n"}" | awk -F= '/=/{print "<"$1">"}' | tr "\n" " "
+  echo -e "${argline// /"\\n"}" | awk -F= '/=/{print "<"$1">"}' | tr "\\n" " "
 }
 
 fn-desc() {
@@ -49,7 +51,7 @@ fn-print-os-id() {
   declare desc="Returns the release id of the operating system"
   local OSRELEASE="${SSHCOMMAND_OSRELEASE:="/etc/os-release"}"
   if [[ -f $OSRELEASE ]]; then
-    sed -n 's#^ID=\(.*\)#\1#p' "$OSRELEASE"
+    sed -n 's#^ID=\(.*\)#\1#p' "$OSRELEASE" | tr -d '"'
   else
     echo unknown
   fi
@@ -70,7 +72,7 @@ fn-adduser() {
     debian*|ubuntu|raspbian*)
       adduser --disabled-password --gecos "" "$l_user"
       ;;
-    arch)
+    arch|amzn)
       useradd -m -s /bin/bash "$l_user"
       usermod -L -aG "$l_user" "$l_user"
       ;;
@@ -85,12 +87,12 @@ fn-adduser() {
 log-fail() {
   declare desc="Log fail formatter"
   echo "$@" 1>&2
-  exit -1
+  exit 1
 }
 
 log-verbose() {
   declare desc="Log verbose formatter"
-  if [[ ! -z "$SSHCOMMAND_VERBOSE_OUTPUT" ]]; then
+  if [[ -n "$SSHCOMMAND_VERBOSE_OUTPUT" ]]; then
     echo "$@"
   fi
 }
@@ -130,8 +132,8 @@ sshcommand-acl-add() {
   USERHOME=$(sh -c "echo ~$USER")
 
   NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
-  if [[ ! -z "$NEW_KEY" ]]; then
-    log-fail "Duplicate SSH Key name"
+  if [[ "$SSHCOMMAND_CHECK_DUPLICATE_NAME" == "true" ]] && [[ -n "$NEW_KEY" ]]; then
+    log-fail "Duplicate ssh key name"
   fi
 
   if [[ -z "$KEY_FILE" ]]; then
@@ -146,10 +148,14 @@ sshcommand-acl-add() {
   count="$(wc -l <<< "$KEY")"
   [[ "$count" -eq 1 ]] || log-fail "Too many keys provided, set one per invocation of sshcommand acl-add <USER> <NAME>"
 
-  FINGERPRINT=$(ssh-keygen -lf "$KEY_FILE" | awk '{print $2}')
+  FINGERPRINT=$(ssh-keygen -lf <(echo "command=\"dummy to fail when options already exist\" $KEY") | awk '{print $2}')
 
   if [[ ! "$FINGERPRINT" =~ :.* ]]; then
     log-fail "Invalid ssh public key"
+  fi
+
+  if [[ "$SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT" == "true" ]] && grep -qF "$FINGERPRINT" "$USERHOME/.ssh/authorized_keys"; then
+    log-fail "Duplicate ssh public key specified"
   fi
 
   ALLOWED_KEYS="${SSHCOMMAND_ALLOWED_KEYS:="no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"}"
@@ -174,21 +180,30 @@ sshcommand-acl-remove() {
 }
 
 sshcommand-list() {
-  declare desc="Lists SSH keys by user and an optional name"
-  declare userhome USER="$1" NAME="$2"
+  declare desc="Lists SSH keys by user, an optional name and a optional output format (JSON)"
+  declare userhome USER="$1" NAME="$2" OUTPUT_TYPE="${3:-$2}"
   [[ -z "$USER" ]] && log-fail "Usage: sshcommand list" "$(fn-args "sshcommand-list")"
 
   getent passwd "$USER" > /dev/null || log-fail "\"$USER\" is not a user on this system"
   userhome=$(sh -c "echo ~$USER")
   [[ -e "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys not found for $USER"
   [[ -s "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys is empty for $USER"
-  OUTPUT="$(sed --silent --regexp-extended \
+
+  if [[ -n "$OUTPUT_TYPE" ]] && [[ "$OUTPUT_TYPE" == "json" ]]; then
+    data=$(sed --silent --regexp-extended \
+      's/^command="FINGERPRINT=(\S+) NAME=(\\"|)(.*)\2 `.*",(\S+).*/{ "fingerprint": "\1", "name": "\3", "SSHCOMMAND_ALLOWED_KEYS": "\4" }/p' \
+      "$userhome/.ssh/authorized_keys" | tr '\n' ',' | sed '$s/,$/\n/')
+
+    echo "[${data}]";
+  else
+    OUTPUT="$(sed --silent --regexp-extended \
         's/^command="FINGERPRINT=(\S+) NAME=(\\"|)(.*)\2 `.*",(\S+).*/\1 NAME="\3" SSHCOMMAND_ALLOWED_KEYS="\4"/p' \
         "$userhome/.ssh/authorized_keys")"
-  if [[ -n "$NAME" ]]; then
-    echo "$OUTPUT" | grep "NAME=\"$NAME\""
-  else
-    echo "$OUTPUT"
+    if [[ -n "$NAME" ]]; then
+      echo "$OUTPUT" | grep "NAME=\"$NAME\""
+    else
+      echo "$OUTPUT"
+    fi
   fi
 }
 
@@ -203,12 +218,12 @@ sshcommand-help() {
 
   echo "sshcommand ${SSHCOMMAND_VERSION}"
   echo ""
-  printf "  %-10s %-30s %s\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
-  printf "  %-10s %-30s %s\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
-  printf "  %-10s %-30s %s\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
-  printf "  %-10s %-30s %s\n" "list"       "$(fn-args "sshcommand-list")"       "$(fn-desc "sshcommand-list")"
-  printf "  %-10s %-30s %s\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
-  printf "  %-10s %-30s %s\n" "version"    "$(fn-args "sshcommand-version")"    "$(fn-desc "sshcommand-version")"
+  printf "  %-10s %-30s %s\\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
+  printf "  %-10s %-30s %s\\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
+  printf "  %-10s %-30s %s\\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
+  printf "  %-10s %-30s %s\\n" "list"       "$(fn-args "sshcommand-list")"       "$(fn-desc "sshcommand-list")"
+  printf "  %-10s %-30s %s\\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
+  printf "  %-10s %-30s %s\\n" "version"    "$(fn-args "sshcommand-version")"    "$(fn-desc "sshcommand-version")"
 }
 
 sshcommand-version() {
@@ -225,7 +240,7 @@ main() {
   local cmd="sshcommand-$1"
   shift 1
 
-  if declare -f $cmd > /dev/null; then
+  if declare -f "$cmd" > /dev/null; then
     $cmd "$@"
   else
     log-fail "Invalid command"
