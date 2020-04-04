@@ -8,6 +8,7 @@ if [[ -f /etc/defaults/sshcommand ]]; then
 fi
 
 declare SSHCOMMAND_VERSION=""
+declare SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT=${SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT:="true"}
 
 cmd-help() {
   declare desc="Shows help information for a command"
@@ -131,7 +132,7 @@ sshcommand-acl-add() {
 
   NEW_KEY=$(grep "NAME=\\\\\"$NAME"\\\\\" "$USERHOME/.ssh/authorized_keys" || true)
   if [[ ! -z "$NEW_KEY" ]]; then
-    log-fail "Duplicate SSH Key name"
+    log-fail "Duplicate ssh key name"
   fi
 
   if [[ -z "$KEY_FILE" ]]; then
@@ -150,6 +151,10 @@ sshcommand-acl-add() {
 
   if [[ ! "$FINGERPRINT" =~ :.* ]]; then
     log-fail "Invalid ssh public key"
+  fi
+
+  if [[ "$SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT" == "true" ]] && grep -qF "$FINGERPRINT" "$USERHOME/.ssh/authorized_keys"; then
+    log-fail "Duplicate ssh public key specified"
   fi
 
   ALLOWED_KEYS="${SSHCOMMAND_ALLOWED_KEYS:="no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"}"

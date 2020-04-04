@@ -19,6 +19,9 @@ All notable changes to this project will be documented in this file.
 - @josegonzalez Drop unsupported debian-based operating systems
 - @josegonzalez Do not release to the betafish channel
 
+### Fixed
+- @josegonzalez Do not allow users to re-specify an ssh key under a different name
+
 ## [0.9.0] - 2019-09-20
 
 ### Added
