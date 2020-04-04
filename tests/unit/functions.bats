@@ -23,6 +23,12 @@ load test_helper
   assert_output "alpine"
   assert_success
 
+  SSHCOMMAND_OSRELEASE=$BATS_TEST_DIRNAME/fixtures/os/amzn-2-os-release run "fn-print-os-id"
+  echo "output: $output"
+  echo "status: $status"
+  assert_output "amzn"
+  assert_success
+
   SSHCOMMAND_OSRELEASE=$BATS_TEST_DIRNAME/fixtures/os/arch-os-release run "fn-print-os-id"
   echo "output: $output"
   echo "status: $status"
