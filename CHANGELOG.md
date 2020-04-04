@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - @josegonzalez Drop unsupported debian-based operating systems
+- @josegonzalez Do not release to the betafish channel
 
 ## [0.9.0] - 2019-09-20
 

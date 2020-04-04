@@ -1,7 +1,8 @@
 version: 2
 jobs:
   build:
-    machine: {}
+    machine:
+      docker_layer_caching: false
     steps:
       - checkout
       - run:
@@ -24,6 +25,5 @@ jobs:
       - run:
           command: |
             if [[ "$CIRCLE_BRANCH" == "release" ]]; then
-              make release-in-docker
+              make release-in-docker release-packagecloud-in-docker
             fi
-            make release-packagecloud-in-docker
