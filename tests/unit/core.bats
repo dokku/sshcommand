@@ -138,6 +138,21 @@ check_custom_allowed_keys() {
   echo "status: $status"
   assert_failure
   check_authorized_keys_entry "$TEST_KEY_NAME" user1
+
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | sshcommand acl-add $TEST_USER user2"
+  echo "output: $output"
+  echo "status: $status"
+  assert_failure
+
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | SSHCOMMAND_CHECK_DUPLICATE_NAME=false sshcommand acl-add $TEST_USER user2"
+  echo "output: $output"
+  echo "status: $status"
+  assert_failure
+
+  run bash -c "cat ${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub | SSHCOMMAND_CHECK_DUPLICATE_NAME=false SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT=false sshcommand acl-add $TEST_USER user2"
+  echo "output: $output"
+  echo "status: $status"
+  assert_success
 }
 
 @test "(core) sshcommand acl-remove" {
