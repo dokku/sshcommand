@@ -144,17 +144,8 @@ release-packagecloud:
 	@$(MAKE) release-packagecloud-rpm
 
 release-packagecloud-deb: build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/trusty  build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/utopic  build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/vivid   build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/wily    build/deb/$(NAME)_$(VERSION)_amd64.deb
 	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/xenial  build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/yakkety build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/zesty   build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/artful  build/deb/$(NAME)_$(VERSION)_amd64.deb
 	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/bionic  build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/wheezy  build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/jessie  build/deb/$(NAME)_$(VERSION)_amd64.deb
 	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/stretch build/deb/$(NAME)_$(VERSION)_amd64.deb
 	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/buster  build/deb/$(NAME)_$(VERSION)_amd64.deb
 

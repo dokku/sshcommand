@@ -15,6 +15,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - @Filipe-Souza Ability to output JSON format in ssh keys list
 
+### Changed
+- @josegonzalez Drop unsupported debian-based operating systems
+
 ## [0.9.0] - 2019-09-20
 
 ### Added
@@ -33,7 +36,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.7.0] - 2017-03-22
 ### Fixed
-- @callahad  Only allow one key per file in acl-add. Otherwise, the additional keys get added without the sshcommand wrapper.
+- @callahad Only allow one key per file in acl-add. Otherwise, the additional keys get added without the sshcommand wrapper.
 
 ### Added
 - @michaelshobbs automated releases
