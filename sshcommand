@@ -137,9 +137,7 @@ sshcommand-acl-add() {
   fi
 
   if [[ -z "$KEY_FILE" ]]; then
-    KEY_FILE=$(mktemp)
-    KEY=$(tee "$KEY_FILE")
-    trap 'rm -f "$KEY_FILE"' INT EXIT
+    KEY=$(cat)
   else
     KEY=$(cat "$KEY_FILE")
   fi
