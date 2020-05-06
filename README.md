@@ -39,6 +39,11 @@ If the public key is already on the server, you may also specify it as an argume
 
     $ ssh root@server sshcommand acl-add cmd progrium ~/.ssh/id_rsa.pub
 
+By default, key names and fingerprints must be unique. Both of these checks can be disabled by setting the following environment variables to `false`:
+
+    export SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT="false"
+    export SSHCOMMAND_CHECK_DUPLICATE_NAME="false"
+
 Now anywhere with the private key you can easily run:
 
     $ ssh cmd@server
