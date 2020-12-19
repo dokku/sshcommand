@@ -246,12 +246,21 @@ sshcommand-version() {
 }
 
 main() {
-  if [[ -z "$1" ]]; then
+  declare COMMAND_SUFFIX="$1"
+  if [[ -z "$COMMAND_SUFFIX" ]]; then
     sshcommand-help "$@"
     exit 1
   fi
 
-  local cmd="sshcommand-$1"
+  if [[ "$COMMAND_SUFFIX" == "-h" ]] || [[ "$COMMAND_SUFFIX" == "--help" ]]; then
+    COMMAND_SUFFIX="help"
+  fi
+
+  if [[ "$COMMAND_SUFFIX" == "-v" ]] || [[ "$COMMAND_SUFFIX" == "--version" ]]; then
+    COMMAND_SUFFIX="version"
+  fi
+
+  local cmd="sshcommand-$COMMAND_SUFFIX"
   shift 1
 
   if declare -f "$cmd" > /dev/null; then
