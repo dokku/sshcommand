@@ -17,12 +17,13 @@ ssh ls@server <your-args>
 ## Commands
 
 ```shell
-sshcommand create     <USER> <COMMAND>                 # Creates a user forced to run command when SSH connects
-sshcommand acl-add    <USER> <NAME> <KEY_FILE>         # Adds named SSH key to user from STDIN or argument
-sshcommand acl-remove <USER> <NAME>                    # Removes SSH key by name
-sshcommand list       <USER> [<NAME>] [<OUTPUT_TYPE>]  # Lists SSH keys by user, an optional name and a optional output format (JSON)
-sshcommand help       <COMMAND>                        # Shows help information
-sshcommand version                                     # Shows version
+sshcommand create                    <USER> <COMMAND>                # Creates a local system user and installs sshcommand skeleton
+sshcommand acl-add                   <USER> <NAME> <KEY_FILE>        # Adds named SSH key to user from STDIN or argument
+sshcommand acl-remove                <USER> <NAME>                   # Removes SSH key by name
+sshcommand acl-remove-by-fingerprint <USER> <FINGERPRINT>            # Removes SSH key by fingerprint
+sshcommand list                      <USER> [<NAME>] [<OUTPUT_TYPE>] # Lists SSH keys by user, an optional name and a optional output format (JSON)
+sshcommand help                      <COMMAND>                       # Shows help information
+sshcommand version                                                   # Shows version
 ```
 
 ## Example

@@ -31,7 +31,7 @@ fn-args() {
 fn-desc() {
   declare desc="Inspect a function's description"
   desc=""
-  eval "$(type "$1" | grep desc | head -1)"; echo $desc
+  eval "$(type "$1" | grep desc | head -1)"; echo "$desc"
 }
 
 fn-info() {
@@ -177,6 +177,22 @@ sshcommand-acl-remove() {
   sed --in-place "/ NAME=\\\\\"$NAME\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
 }
 
+sshcommand-acl-remove-by-fingerprint() {
+  declare desc="Removes SSH key by fingerprint"
+  declare USER="$1" FINGERPRINT="$2"
+  local USERHOME
+
+  if [[ -z "$USER" ]] || [[ -z "$FINGERPRINT" ]]; then
+    log-fail "Usage: sshcommand acl-remove-by-fingerprint" "$(fn-args "sshcommand-acl-remove-by-fingerprint")"
+  fi
+
+  getent passwd "$USER" > /dev/null || false
+  USERHOME=$(sh -c "echo ~$USER")
+
+  # shellcheck disable=SC1117
+  sed --in-place "\#\"FINGERPRINT=$FINGERPRINT #d" "$USERHOME/.ssh/authorized_keys"
+}
+
 sshcommand-list() {
   declare desc="Lists SSH keys by user, an optional name and a optional output format (JSON)"
   declare userhome USER="$1" NAME="$2" OUTPUT_TYPE="${3:-$2}"
@@ -216,12 +232,13 @@ sshcommand-help() {
 
   echo "sshcommand ${SSHCOMMAND_VERSION}"
   echo ""
-  printf "  %-10s %-30s %s\\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
-  printf "  %-10s %-30s %s\\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
-  printf "  %-10s %-30s %s\\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
-  printf "  %-10s %-30s %s\\n" "list"       "$(fn-args "sshcommand-list")"       "$(fn-desc "sshcommand-list")"
-  printf "  %-10s %-30s %s\\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
-  printf "  %-10s %-30s %s\\n" "version"    "$(fn-args "sshcommand-version")"    "$(fn-desc "sshcommand-version")"
+  printf "  %-25s %-30s %s\\n" "create"     "$(fn-args "sshcommand-create")"     "$(fn-desc "sshcommand-create")"
+  printf "  %-25s %-30s %s\\n" "acl-add"    "$(fn-args "sshcommand-acl-add")"    "$(fn-desc "sshcommand-acl-add")"
+  printf "  %-25s %-30s %s\\n" "acl-remove" "$(fn-args "sshcommand-acl-remove")" "$(fn-desc "sshcommand-acl-remove")"
+  printf "  %-25s %-30s %s\\n" "acl-remove-by-fingerprint" "$(fn-args "sshcommand-acl-remove-by-fingerprint")" "$(fn-desc "sshcommand-acl-remove-by-fingerprint")"
+  printf "  %-25s %-30s %s\\n" "list"       "$(fn-args "sshcommand-list")"       "$(fn-desc "sshcommand-list")"
+  printf "  %-25s %-30s %s\\n" "help"       "$(fn-args "sshcommand-help")"       "$(fn-desc "sshcommand-help")"
+  printf "  %-25s %-30s %s\\n" "version"    "$(fn-args "sshcommand-version")"    "$(fn-desc "sshcommand-version")"
 }
 
 sshcommand-version() {
@@ -230,12 +247,21 @@ sshcommand-version() {
 }
 
 main() {
-  if [[ -z "$1" ]]; then
+  declare COMMAND_SUFFIX="$1"
+  if [[ -z "$COMMAND_SUFFIX" ]]; then
     sshcommand-help "$@"
     exit 1
   fi
 
-  local cmd="sshcommand-$1"
+  if [[ "$COMMAND_SUFFIX" == "-h" ]] || [[ "$COMMAND_SUFFIX" == "--help" ]]; then
+    COMMAND_SUFFIX="help"
+  fi
+
+  if [[ "$COMMAND_SUFFIX" == "-v" ]] || [[ "$COMMAND_SUFFIX" == "--version" ]]; then
+    COMMAND_SUFFIX="version"
+  fi
+
+  local cmd="sshcommand-$COMMAND_SUFFIX"
   shift 1
 
   if declare -f "$cmd" > /dev/null; then
