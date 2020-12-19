@@ -189,6 +189,7 @@ sshcommand-acl-remove-by-fingerprint() {
   getent passwd "$USER" > /dev/null || false
   USERHOME=$(sh -c "echo ~$USER")
 
+  # shellcheck disable=SC1117
   sed --in-place "\#\"FINGERPRINT=$FINGERPRINT #d" "$USERHOME/.ssh/authorized_keys"
 }
 
