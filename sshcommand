@@ -117,6 +117,7 @@ sshcommand-create() {
   USERHOME=$(sh -c "echo ~$USER")
   mkdir -p "$USERHOME/.ssh"
   touch "$USERHOME/.ssh/authorized_keys"
+  chmod 0700 "$USERHOME/.ssh/authorized_keys"
   echo "$COMMAND" >"$USERHOME/.sshcommand"
   chown -R "$USER" "$USERHOME"
 }
@@ -161,6 +162,7 @@ sshcommand-acl-add() {
   ALLOWED_KEYS="${SSHCOMMAND_ALLOWED_KEYS:="no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"}"
   KEY_PREFIX="command=\"FINGERPRINT=$FINGERPRINT NAME=\\\"$NAME\\\" \`cat $USERHOME/.sshcommand\` \$SSH_ORIGINAL_COMMAND\",$ALLOWED_KEYS"
   echo "$KEY_PREFIX $KEY" >>"$USERHOME/.ssh/authorized_keys"
+  chmod 0700 "$USERHOME/.ssh/authorized_keys"
   echo "$FINGERPRINT"
 }
 
@@ -177,6 +179,7 @@ sshcommand-acl-remove() {
   USERHOME=$(sh -c "echo ~$USER")
 
   sed --in-place "/ NAME=\\\\\"$NAME\\\\\" /d" "$USERHOME/.ssh/authorized_keys"
+  chmod 0700 "$USERHOME/.ssh/authorized_keys"
 }
 
 sshcommand-acl-remove-by-fingerprint() {
@@ -193,6 +196,7 @@ sshcommand-acl-remove-by-fingerprint() {
 
   # shellcheck disable=SC1117
   sed --in-place "\#\"FINGERPRINT=$FINGERPRINT #d" "$USERHOME/.ssh/authorized_keys"
+  chmod 0700 "$USERHOME/.ssh/authorized_keys"
 }
 
 sshcommand-list() {
