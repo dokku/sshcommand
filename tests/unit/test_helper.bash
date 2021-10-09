@@ -7,8 +7,11 @@ TEST_KEY_DIR=/tmp/test_keys
 
 # test functions
 flunk() {
-  { if [[ "$#" -eq 0 ]]; then cat -
-    else echo "$*"
+  {
+    if [[ "$#" -eq 0 ]]; then
+      cat -
+    else
+      echo "$*"
     fi
   }
   return 1
@@ -34,7 +37,8 @@ assert_failure() {
 
 assert_equal() {
   if [[ "$1" != "$2" ]]; then
-    { echo "expected: $1"
+    {
+      echo "expected: $1"
       echo "actual:   $2"
     } | flunk
   fi
@@ -94,7 +98,7 @@ assert_exit_status() {
 
 # sshcommand helpers
 create_user() {
-  sshcommand create $TEST_USER ls > /dev/null
+  sshcommand create $TEST_USER ls >/dev/null
 }
 
 delete_user() {
@@ -102,7 +106,8 @@ delete_user() {
 }
 
 create_test_key() {
-  KEY_NAME="$1"; KEY_NAME=${KEY_NAME:=$TEST_KEY_NAME}
+  KEY_NAME="$1"
+  KEY_NAME=${KEY_NAME:=$TEST_KEY_NAME}
   mkdir -p $TEST_KEY_DIR
   ssh-keygen -N '' -q -f "$TEST_KEY_DIR/$KEY_NAME"
 }

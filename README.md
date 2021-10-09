@@ -1,16 +1,18 @@
-# sshcommand [![Build Status](https://img.shields.io/circleci/project/dokku/sshcommand/master.svg?style=flat-square "Build Status")](https://circleci.com/gh/dokku/sshcommand/tree/master)
+# sshcommand
+
+[![Build Status](https://github.com/dokku/sshcommand/workflows/CI/badge.svg)](https://github.com/dokku/sshcommand/actions?query=workflow%3ACI)
 
 Simplifies running a single command over SSH, and manages authorized keys (ACL) and users in order to do so.
 
 It basically simplifies running:
 
-```
+```shell
 ssh user@server 'ls -l <your-args>'
 ```
 
 into:
 
-```
+```shell
 ssh ls@server <your-args>
 ```
 
@@ -30,39 +32,53 @@ sshcommand version                                                   # Shows ver
 
 On a server, create a new command user:
 
-    $ sshcommand create cmd /path/to/command
+```shell
+sshcommand create cmd /path/to/command
+```
 
 On your computer, add authorized keys with your key:
 
-    $ cat ~/.ssh/id_rsa.pub | ssh root@server sshcommand acl-add cmd progrium
+```shell
+cat ~/.ssh/id_rsa.pub | ssh root@server sshcommand acl-add cmd progrium
+```
 
 If the public key is already on the server, you may also specify it as an argument:
 
-    $ ssh root@server sshcommand acl-add cmd progrium ~/.ssh/id_rsa.pub
+```shell
+ssh root@server sshcommand acl-add cmd progrium ~/.ssh/id_rsa.pub
+```
 
 By default, key names and fingerprints must be unique. Both of these checks can be disabled by setting the following environment variables to `false`:
 
-    export SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT="false"
-    export SSHCOMMAND_CHECK_DUPLICATE_NAME="false"
+```shell
+export SSHCOMMAND_CHECK_DUPLICATE_FINGERPRINT="false"
+export SSHCOMMAND_CHECK_DUPLICATE_NAME="false"
+```
 
 Now anywhere with the private key you can easily run:
 
-    $ ssh cmd@server
+```shell
+ssh cmd@server
+```
 
 Anything you pass as the command string will be appended to the command. You can use this
 to pass arguments or if your command takes subcommands, expose those subcommands easily.
 
-    $ /path/to/command subcommand
+```shell
+/path/to/command subcommand
+```
 
 Can be run remotely with:
 
-    $ ssh cmd@server subcommand
+```shell
+ssh cmd@server subcommand
+```
 
 When adding an authorized key, you can also specify custom options for `AUTHORIZED_KEYS`
 by specifying the `SSHCOMMAND_ALLOWED_KEYS` environment variable. This should be a list
 of comma-separated options. The default keys are as follows:
 
-```
+```shell
 no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding
 ```
 
