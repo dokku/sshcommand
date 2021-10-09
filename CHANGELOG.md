@@ -1,30 +1,37 @@
 # Change Log
+
 All notable changes to this project will be documented in this file.
 
-## [Unreleased][unreleased]
-### Fixed
+## [0.13.0](https://github.com/dokku/sshcommand/compare/v0.12.0...v0.13.0) - 2021-10-08
 
 ### Added
 
+- #59 @josegonzalez Add bullseye to deb release task
+- #60 @josegonzalez Chown authorized_keys file as needed
+
 ### Removed
+
+- #62 @josegonzalez Drop xenial support
 
 ### Changed
 
-## [0.12.0] - 2020-12-19
+- #61 @josegonzalez Switch from CircleCI to Github Actions
+
+## [0.12.0](https://github.com/dokku/sshcommand/compare/v0.11.0...v0.12.0) - 2020-12-19
 
 ### Added
 
 - @josegonzalez add support for removing ssh keys by fingerprint
-- @josegonzalez add support for help and version flags …
+- @josegonzalez add support for help and version flags
 
-## [0.11.0] - 2020-05-06
+## [0.11.0](https://github.com/dokku/sshcommand/compare/v0.10.0...v0.11.0) - 2020-05-06
 
 ### Changed
 
 - @josegonzalez Avoid writing acl-add key to temporary file
 - @josegonzalez Release packages for focal
 
-## [0.10.0] - 2020-04-03
+## [0.10.0](https://github.com/dokku/sshcommand/compare/v0.9.0...v0.10.0) - 2020-04-03
 
 ### Added
 - @Filipe-Souza Ability to output JSON format in ssh keys list
@@ -40,12 +47,12 @@ All notable changes to this project will be documented in this file.
 - @josegonzalez Correct shellcheck issues with shellcheck 0.7.0
 - @znz Ignore options in key file
 
-## [0.9.0] - 2019-09-20
+## [0.9.0](https://github.com/dokku/sshcommand/compare/v0.8.0...v0.9.0) - 2019-09-20
 
 ### Added
 - @josegonzalez Add ability to list a single name's keys
 
-## [0.8.0] - 2019-08-10
+## [0.8.0](https://github.com/dokku/sshcommand/compare/v0.7.0...v0.8.0) - 2019-08-10
 ### Fixed
 - @fruitl00p delete_user is now portable
 
@@ -56,7 +63,7 @@ All notable changes to this project will be documented in this file.
 - @josegonzalez Release packages via CI
 - @josegonzalez Add version command
 
-## [0.7.0] - 2017-03-22
+## [0.7.0](https://github.com/dokku/sshcommand/compare/v0.6.0...v0.7.0) - 2017-03-22
 ### Fixed
 - @callahad Only allow one key per file in acl-add. Otherwise, the additional keys get added without the sshcommand wrapper.
 
@@ -64,7 +71,7 @@ All notable changes to this project will be documented in this file.
 - @michaelshobbs automated releases
 
 
-## [0.6.0] - 2016-08-26
+## [0.6.0](https://github.com/dokku/sshcommand/compare/v0.5.0...v0.6.0) - 2016-08-26
 ### Fixed
 - @IlyaSemenov Fixed failing unit test for sshcommand list
 
@@ -78,12 +85,12 @@ All notable changes to this project will be documented in this file.
 - @IlyaSemenov Pinned base Docker image
 
 
-## [0.5.0] - 2016-06-30
+## [0.5.0](https://github.com/dokku/sshcommand/compare/v0.4.0...v0.5.0) - 2016-06-30
 ### Added
 @u2mejc Add sshcommand-list, add clarity to help
 
 
-## [0.4.0] - 2016-04-03
+## [0.4.0](https://github.com/dokku/sshcommand/compare/v0.3.0...v0.4.0) - 2016-04-03
 ### Added
 - @josegonzalez Add the ability to specify the key_file as an argument
 - @josegonzalez Allow sourcing configuration defaults
@@ -100,7 +107,7 @@ All notable changes to this project will be documented in this file.
 - @josegonzalez Move apt-get call up so we can cache the call
 
 
-## [0.3.0] - 2016-04-03
+## [0.3.0](https://github.com/dokku/sshcommand/compare/v0.2.0...v0.3.0) - 2016-04-03
 ### Fixed
 - @josegonzalez Exit correctly when command is misused
 - @josegonzalez Exit immediately on log-fail call
@@ -130,7 +137,7 @@ All notable changes to this project will be documented in this file.
 - @josegonzalez Use same naming schema everywhere
 
 
-## [0.2.0] - 2016-04-02
+## [0.2.0](https://github.com/dokku/sshcommand/compare/v0.1.0...v0.2.0) - 2016-04-02
 ### Fixed
 - @michaelshobbs fix stale handle stdin. error on no fingerprint
 
@@ -147,16 +154,3 @@ All notable changes to this project will be documented in this file.
 - @alessio Use double quote to prevent globbing and word splitting
 - @michaelshobbs update build image in README
 - @jvanbaarsen Only add SSH key if it doesn't already exists
-
-[unreleased]: https://github.com/dokku/sshcommand/compare/v0.12.0...HEAD
-[0.12.0]: https://github.com/dokku/sshcommand/compare/v0.11.0...v0.12.0
-[0.11.0]: https://github.com/dokku/sshcommand/compare/v0.10.0...v0.11.0
-[0.10.0]: https://github.com/dokku/sshcommand/compare/v0.9.0...v0.10.0
-[0.9.0]: https://github.com/dokku/sshcommand/compare/v0.8.0...v0.9.0
-[0.8.0]: https://github.com/dokku/sshcommand/compare/v0.7.0...v0.8.0
-[0.7.0]: https://github.com/dokku/sshcommand/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/dokku/sshcommand/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/dokku/sshcommand/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/dokku/sshcommand/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/dokku/sshcommand/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/dokku/sshcommand/compare/v0.1.0...v0.2.0
