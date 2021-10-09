@@ -49,7 +49,7 @@ targets = $(addsuffix -in-docker, $(LIST))
 build: pre-build
 	@$(MAKE) build/darwin/$(NAME)
 	@$(MAKE) build/linux/$(NAME)
-	@$(MAKE) build/deb/$(NAME)_$(VERSION)_amd64.deb
+	@$(MAKE) build/deb/$(NAME)_$(VERSION)_all.deb
 	@$(MAKE) build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
 
 build-docker-image:
@@ -75,12 +75,12 @@ build/linux/$(NAME):
 	mkdir -p build/linux
 	cp -f sshcommand build/linux/sshcommand
 
-build/deb/$(NAME)_$(VERSION)_amd64.deb: build/linux/$(NAME)
+build/deb/$(NAME)_$(VERSION)_all.deb: build/linux/$(NAME)
 	chmod 644 LICENSE
 	export SOURCE_DATE_EPOCH=$(shell git log -1 --format=%ct) \
 		&& mkdir -p build/deb \
 		&& fpm \
-		--architecture amd64 \
+		--architecture all \
 		--category admin \
 		--description "$$PACKAGE_DESCRIPTION" \
 		--input-type dir \
@@ -88,7 +88,7 @@ build/deb/$(NAME)_$(VERSION)_amd64.deb: build/linux/$(NAME)
 		--maintainer "$(MAINTAINER_NAME) <$(EMAIL)>" \
 		--name $(NAME) \
 		--output-type deb \
-		--package build/deb/$(NAME)_$(VERSION)_amd64.deb \
+		--package build/deb/$(NAME)_$(VERSION)_all.deb \
 		--url "https://github.com/$(MAINTAINER)/$(REPOSITORY)" \
 		--vendor "" \
 		--version $(VERSION) \
@@ -135,7 +135,7 @@ release: bin/gh-release
 	rm -rf release && mkdir release
 	tar -zcf release/$(NAME)_$(VERSION)_linux_$(HARDWARE).tgz -C build/linux $(NAME)
 	tar -zcf release/$(NAME)_$(VERSION)_darwin_$(HARDWARE).tgz -C build/darwin $(NAME)
-	cp build/deb/$(NAME)_$(VERSION)_amd64.deb release/$(NAME)_$(VERSION)_amd64.deb
+	cp build/deb/$(NAME)_$(VERSION)_all.deb release/$(NAME)_$(VERSION)_all.deb
 	cp build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm release/$(NAME)-$(VERSION)-1.x86_64.rpm
 	bin/gh-release create $(MAINTAINER)/$(REPOSITORY) $(VERSION) $(shell git rev-parse --abbrev-ref HEAD)
 
@@ -143,25 +143,25 @@ release-packagecloud:
 	@$(MAKE) release-packagecloud-deb
 	@$(MAKE) release-packagecloud-rpm
 
-release-packagecloud-deb: build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/bionic  build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/focal  build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/stretch build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/buster  build/deb/$(NAME)_$(VERSION)_amd64.deb
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/bullseye build/deb/$(NAME)_$(VERSION)_amd64.deb
+release-packagecloud-deb: build/deb/$(NAME)_$(VERSION)_all.deb
+	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/bionic  build/deb/$(NAME)_$(VERSION)_all.deb
+	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/focal  build/deb/$(NAME)_$(VERSION)_all.deb
+	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/stretch build/deb/$(NAME)_$(VERSION)_all.deb
+	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/buster  build/deb/$(NAME)_$(VERSION)_all.deb
+	package_cloud push $(PACKAGECLOUD_REPOSITORY)/debian/bullseye build/deb/$(NAME)_$(VERSION)_all.deb
 
 release-packagecloud-rpm: build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
 	package_cloud push $(PACKAGECLOUD_REPOSITORY)/el/7           build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
 
 validate: test
 	mkdir -p validation
-	lintian build/deb/$(NAME)_$(VERSION)_amd64.deb || true
-	dpkg-deb --info build/deb/$(NAME)_$(VERSION)_amd64.deb
-	dpkg -c build/deb/$(NAME)_$(VERSION)_amd64.deb
-	cd validation && ar -x ../build/deb/$(NAME)_$(VERSION)_amd64.deb
+	lintian build/deb/$(NAME)_$(VERSION)_all.deb || true
+	dpkg-deb --info build/deb/$(NAME)_$(VERSION)_all.deb
+	dpkg -c build/deb/$(NAME)_$(VERSION)_all.deb
+	cd validation && ar -x ../build/deb/$(NAME)_$(VERSION)_all.deb
 	cd validation && rpm2cpio ../build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm > $(NAME)-$(VERSION)-1.x86_64.cpio
 	ls -lah build/deb build/rpm validation
-	sha1sum build/deb/$(NAME)_$(VERSION)_amd64.deb
+	sha1sum build/deb/$(NAME)_$(VERSION)_all.deb
 	sha1sum build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
 
 test: lint unit-tests
