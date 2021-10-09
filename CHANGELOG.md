@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.14.1](https://github.com/dokku/sshcommand/compare/v0.14.0...v0.14.1) - 2021-10-09
+
+### Added
+
+- #71 @josegonzalez Release package for raspberry pi
+
 ## [0.14.0](https://github.com/dokku/sshcommand/compare/v0.13.2...v0.14.0) - 2021-10-08
 
 ### Changed
