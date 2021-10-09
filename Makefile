@@ -10,7 +10,7 @@ BASE_VERSION ?= 0.12.0
 IMAGE_NAME ?= $(MAINTAINER)/$(REPOSITORY)
 PACKAGECLOUD_REPOSITORY ?= dokku/dokku-betafish
 
-ifeq ($(CIRCLE_BRANCH),release)
+ifeq ($(CI_BRANCH),release)
 	VERSION ?= $(BASE_VERSION)
 	DOCKER_IMAGE_VERSION = $(VERSION)
 else
@@ -20,7 +20,7 @@ endif
 
 version:
 	@sed -i.bak 's/SSHCOMMAND_VERSION=""/SSHCOMMAND_VERSION="$(VERSION)"/' sshcommand && rm sshcommand.bak
-	@echo "$(CIRCLE_BRANCH)"
+	@echo "$(CI_BRANCH)"
 	@echo "$(VERSION)"
 	@./sshcommand version
 
@@ -39,7 +39,7 @@ targets = $(addsuffix -in-docker, $(LIST))
 .env.docker:
 	@rm -f .env.docker
 	@touch .env.docker
-	@echo "CIRCLE_BRANCH=$(CIRCLE_BRANCH)" >> .env.docker
+	@echo "CI_BRANCH=$(CI_BRANCH)" >> .env.docker
 	@echo "GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN)" >> .env.docker
 	@echo "IMAGE_NAME=$(IMAGE_NAME)" >> .env.docker
 	@echo "PACKAGECLOUD_REPOSITORY=$(PACKAGECLOUD_REPOSITORY)" >> .env.docker
@@ -121,7 +121,7 @@ build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm: build/linux/$(NAME)
 clean:
 	rm -rf build release validation
 
-circleci:
+ci-setup:
 	docker version
 	rm -f ~/.gitconfig
 
