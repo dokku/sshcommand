@@ -1,4 +1,6 @@
-# sshcommand [![Build Status](https://img.shields.io/circleci/project/dokku/sshcommand/master.svg?style=flat-square "Build Status")](https://circleci.com/gh/dokku/sshcommand/tree/master)
+# sshcommand
+
+[![Build Status](https://github.com/dokku/sshcommand/workflows/CI/badge.svg)](https://github.com/dokku/sshcommand/actions?query=workflow%3ACI)
 
 Simplifies running a single command over SSH, and manages authorized keys (ACL) and users in order to do so.
 
