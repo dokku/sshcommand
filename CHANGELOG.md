@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.2](https://github.com/dokku/sshcommand/compare/v0.13.1...v0.13.2) - 2021-10-08
+
+### Changed
+
+- #66 @josegonzalez Update gh-release
+
 ## [0.13.1](https://github.com/dokku/sshcommand/compare/v0.13.0...v0.13.1) - 2021-10-08
 
 ### Added
