@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.1](https://github.com/dokku/sshcommand/compare/v0.13.0...v0.13.1) - 2021-10-08
+
+### Added
+
+- #64 @josegonzalez Run tests on the release branch
+
 ## [0.13.0](https://github.com/dokku/sshcommand/compare/v0.12.0...v0.13.0) - 2021-10-08
 
 ### Added
