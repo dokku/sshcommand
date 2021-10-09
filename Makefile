@@ -53,7 +53,7 @@ build: pre-build
 	@$(MAKE) build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
 
 build-docker-image:
-	docker build --rm -q -f build.Dockerfile -t $(IMAGE_NAME):build .
+	docker build --rm -q -t $(IMAGE_NAME):build .
 
 $(targets): %-in-docker: .env.docker
 	docker run \
