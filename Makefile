@@ -50,7 +50,6 @@ build: pre-build
 	@$(MAKE) build/darwin/$(NAME)
 	@$(MAKE) build/linux/$(NAME)
 	@$(MAKE) build/deb/$(NAME)_$(VERSION)_all.deb
-	@$(MAKE) build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
 
 build-docker-image:
 	docker build --rm -q -t $(IMAGE_NAME):build .
@@ -96,28 +95,6 @@ build/deb/$(NAME)_$(VERSION)_all.deb: build/linux/$(NAME)
 		build/linux/$(NAME)=/usr/bin/$(NAME) \
 		LICENSE=/usr/share/doc/$(NAME)/copyright
 
-build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm: build/linux/$(NAME)
-	chmod 644 LICENSE
-	export SOURCE_DATE_EPOCH=$(shell git log -1 --format=%ct) \
-		&& mkdir -p build/rpm \
-		&& fpm \
-		--architecture x86_64 \
-		--category admin \
-		--description "$$PACKAGE_DESCRIPTION" \
-		--input-type dir \
-		--license 'MIT License' \
-		--maintainer "$(MAINTAINER_NAME) <$(EMAIL)>" \
-		--name $(NAME) \
-		--output-type rpm \
-		--package build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm \
-		--rpm-os linux \
-		--url "https://github.com/$(MAINTAINER)/$(REPOSITORY)" \
-		--vendor "" \
-		--version $(VERSION) \
-		--verbose \
-		build/linux/$(NAME)=/usr/bin/$(NAME) \
-		LICENSE=/usr/share/doc/$(NAME)/copyright
-
 clean:
 	rm -rf build release validation
 
@@ -141,13 +118,11 @@ release: bin/gh-release bin/gh-release-body
 	tar -zcf release/$(NAME)_$(VERSION)_linux_$(HARDWARE).tgz -C build/linux $(NAME)
 	tar -zcf release/$(NAME)_$(VERSION)_darwin_$(HARDWARE).tgz -C build/darwin $(NAME)
 	cp build/deb/$(NAME)_$(VERSION)_all.deb release/$(NAME)_$(VERSION)_all.deb
-	cp build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm release/$(NAME)-$(VERSION)-1.x86_64.rpm
 	bin/gh-release create $(MAINTAINER)/$(REPOSITORY) $(VERSION) $(shell git rev-parse --abbrev-ref HEAD)
 	bin/gh-release-body $(MAINTAINER)/$(REPOSITORY) v$(VERSION)
 
 release-packagecloud:
 	@$(MAKE) release-packagecloud-deb
-	@$(MAKE) release-packagecloud-rpm
 
 release-packagecloud-deb: build/deb/$(NAME)_$(VERSION)_all.deb
 	package_cloud push $(PACKAGECLOUD_REPOSITORY)/ubuntu/bionic build/deb/$(NAME)_$(VERSION)_all.deb
@@ -159,19 +134,14 @@ release-packagecloud-deb: build/deb/$(NAME)_$(VERSION)_all.deb
 	package_cloud push $(PACKAGECLOUD_REPOSITORY)/raspbian/buster build/deb/$(NAME)_$(VERSION)_all.deb
 	package_cloud push $(PACKAGECLOUD_REPOSITORY)/raspbian/bullseye build/deb/$(NAME)_$(VERSION)_all.deb
 
-release-packagecloud-rpm: build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
-	package_cloud push $(PACKAGECLOUD_REPOSITORY)/el/7           build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
-
 validate: test
 	mkdir -p validation
 	lintian build/deb/$(NAME)_$(VERSION)_all.deb || true
 	dpkg-deb --info build/deb/$(NAME)_$(VERSION)_all.deb
 	dpkg -c build/deb/$(NAME)_$(VERSION)_all.deb
 	cd validation && ar -x ../build/deb/$(NAME)_$(VERSION)_all.deb
-	cd validation && rpm2cpio ../build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm > $(NAME)-$(VERSION)-1.x86_64.cpio
-	ls -lah build/deb build/rpm validation
+	ls -lah build/deb validation
 	sha1sum build/deb/$(NAME)_$(VERSION)_all.deb
-	sha1sum build/rpm/$(NAME)-$(VERSION)-1.x86_64.rpm
 
 test: lint unit-tests
 
