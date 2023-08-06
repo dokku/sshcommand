@@ -1,8 +1,8 @@
-FROM golang:1.18.1-buster
+FROM golang:1.20.5-buster
 
 # hadolint ignore=DL3027
 RUN apt-get update \
-    && apt install apt-transport-https build-essential curl gnupg2 jq lintian rpm rsync rubygems-integration ruby-dev ruby software-properties-common sudo -qy \
+    && apt install apt-transport-https build-essential curl gnupg2 jq lintian rsync rubygems-integration ruby-dev ruby software-properties-common sudo -qy \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

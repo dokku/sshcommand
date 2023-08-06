@@ -173,7 +173,7 @@ check_custom_allowed_keys() {
   echo "status: $status"
   assert_success
 
-  run bash -c "grep -F \"$(< "${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub")\" ~${TEST_USER}/.ssh/authorized_keys | grep user1"
+  run bash -c "grep -F \"$(<"${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub")\" ~${TEST_USER}/.ssh/authorized_keys | grep user1"
   echo "output: $output"
   echo "status: $status"
   assert_success
@@ -183,7 +183,7 @@ check_custom_allowed_keys() {
   echo "status: $status"
   assert_success
 
-  run bash -c "grep -F \"$(< "${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub")\" ~${TEST_USER}/.ssh/authorized_keys | grep user1"
+  run bash -c "grep -F \"$(<"${TEST_KEY_DIR}/${TEST_KEY_NAME}.pub")\" ~${TEST_USER}/.ssh/authorized_keys | grep user1"
   echo "output: $output"
   echo "status: $status"
   assert_failure

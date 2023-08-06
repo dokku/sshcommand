@@ -19,15 +19,15 @@ jobs:
       fail-fast: true
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: extract branch name
         shell: bash
         run: |
           if [[ "$GITHUB_REF" == *"/pull/"* ]]; then
-            echo "##[set-output name=branch;]${GITHUB_HEAD_REF#refs/heads/}"
+            echo "branch=${GITHUB_HEAD_REF#refs/heads/}" >> $GITHUB_OUTPUT
           else
-            echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+            echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
           fi
         id: extract_branch
 
@@ -55,7 +55,7 @@ jobs:
           CI_BRANCH: ${{ steps.extract_branch.outputs.branch }}
 
       - name: upload packages
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build
           path: build
