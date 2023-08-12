@@ -156,7 +156,8 @@ unit-tests: /usr/local/bin/sshcommand
 	@$(QUIET) TERM=linux bats --formatter bats-format-junit -e -T -o test-results/bats tests/unit
 
 pre-build:
-	true
+	git config --global --add safe.directory $(shell pwd)
+	git status
 
 /usr/local/bin/sshcommand:
 	@echo installing sshcommand
