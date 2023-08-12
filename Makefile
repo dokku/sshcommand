@@ -6,7 +6,7 @@ MAINTAINER_NAME = Jose Diaz-Gonzalez
 REPOSITORY = sshcommand
 HARDWARE = $(shell uname -m)
 SYSTEM_NAME  = $(shell uname -s | tr '[:upper:]' '[:lower:]')
-BASE_VERSION ?= 0.17.0
+BASE_VERSION ?= 0.17.1
 IMAGE_NAME ?= $(MAINTAINER)/$(REPOSITORY)
 PACKAGECLOUD_REPOSITORY ?= dokku/dokku-betafish
 
@@ -156,7 +156,8 @@ unit-tests: /usr/local/bin/sshcommand
 	@$(QUIET) TERM=linux bats --formatter bats-format-junit -e -T -o test-results/bats tests/unit
 
 pre-build:
-	true
+	git config --global --add safe.directory $(shell pwd)
+	git status
 
 /usr/local/bin/sshcommand:
 	@echo installing sshcommand
