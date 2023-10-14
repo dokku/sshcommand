@@ -13,7 +13,7 @@ on:
 jobs:
   hadolint:
     name: hadolint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
 
   markdown-lint:
     name: markdown-lint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
 
   shellcheck:
     name: shellcheck
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -48,7 +48,7 @@ jobs:
 
   shfmt:
     name: shfmt
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
         uses: actions/checkout@v4
@@ -62,7 +62,7 @@ jobs:
 
   yamllint:
     name: yamllint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Clone
         uses: actions/checkout@v4

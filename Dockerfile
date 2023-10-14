@@ -1,4 +1,4 @@
-FROM golang:1.20.5-buster
+FROM golang:1.20.5-bookworm
 
 # hadolint ignore=DL3027
 RUN apt-get update \
@@ -7,4 +7,4 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # hadolint ignore=DL3028
-RUN gem install --no-ri --no-rdoc --quiet rake fpm package_cloud
+RUN gem install --quiet rake fpm package_cloud
