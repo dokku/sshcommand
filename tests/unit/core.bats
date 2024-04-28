@@ -210,7 +210,7 @@ check_custom_allowed_keys() {
   echo "status: $status"
   assert_equal \
     "$(head -n1 tests/unit/fixtures/authorized_keys/sshcommand_list_expected_json_output)" \
-    "$(sshcommand list "$TEST_USER" md5 json)"
+    "$(sshcommand list "$TEST_USER" "" json)"
 }
 
 @test "(core) sshcommand list (authorized_keys format variants)" {
@@ -231,8 +231,8 @@ check_custom_allowed_keys() {
   echo "status: $status"
 
   assert_equal \
-    "$(cat tests/unit/fixtures/authorized_keys/sshcommand_list_expected_json_output)" \
-    "$(sshcommand list "$TEST_USER" json)"
+    "$(cat tests/unit/fixtures/authorized_keys/sshcommand_list_expected_json_output_md5_filtered)" \
+    "$(sshcommand list "$TEST_USER" "md5" json)"
   rm "/home/${TEST_USER}/.ssh/authorized_keys"
 }
 
