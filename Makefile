@@ -151,7 +151,7 @@ lint: shellcheck bats
 unit-tests: /usr/local/bin/sshcommand
 	@echo running unit tests...
 	@mkdir -p test-results/bats
-	@$(QUIET) TERM=linux bats --formatter bats-format-junit -e -T -o test-results/bats tests/unit
+	@$(QUIET) TERM=linux bats --formatter junit -e -T -o test-results/bats tests/unit
 
 pre-build:
 	git config --global --add safe.directory $(shell pwd)
