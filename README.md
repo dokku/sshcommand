@@ -1,7 +1,5 @@
 # sshcommand
 
-[![Build Status](https://github.com/dokku/sshcommand/workflows/CI/badge.svg)](https://github.com/dokku/sshcommand/actions?query=workflow%3ACI)
-
 Simplifies running a single command over SSH, and manages authorized keys (ACL) and users in order to do so.
 
 It basically simplifies running:
