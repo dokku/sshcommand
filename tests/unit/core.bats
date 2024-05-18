@@ -205,7 +205,7 @@ check_custom_allowed_keys() {
   assert_failure
 
   cp tests/unit/fixtures/authorized_keys/input_variants "/home/${TEST_USER}/.ssh/authorized_keys"
-  run bash -c "sshcommand list $TEST_USER md5"
+  run bash -c "sshcommand list $TEST_USER '' json"
   echo "output: $output"
   echo "status: $status"
   assert_equal \
@@ -226,7 +226,7 @@ check_custom_allowed_keys() {
 
 @test "(core) sshcommand list (json output)" {
   cp tests/unit/fixtures/authorized_keys/input_variants "/home/${TEST_USER}/.ssh/authorized_keys"
-  run bash -c "sshcommand list $TEST_USER json"
+  run bash -c "sshcommand list $TEST_USER md5 json"
   echo "output: $output"
   echo "status: $status"
 
