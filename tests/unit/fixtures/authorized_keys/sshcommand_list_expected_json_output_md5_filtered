@@ -1,1 +1,1 @@
-[{ "fingerprint": "2a:f7:39:1c:63:80:c4:9e:a8:92:ec:e6:94:91:fa:c0", "name": "md5", "SSHCOMMAND_ALLOWED_KEYS": "no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding" }]
+[{"fingerprint":"2a:f7:39:1c:63:80:c4:9e:a8:92:ec:e6:94:91:fa:c0","name":"md5","SSHCOMMAND_ALLOWED_KEYS":"no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding"}]
