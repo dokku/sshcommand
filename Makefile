@@ -177,7 +177,7 @@ ifneq ($(shell bats --version >/dev/null 2>&1 ; echo $$?),0)
 	brew install bats-core
 endif
 else
-	git clone https://github.com/josegonzalez/bats-core.git /tmp/bats
+	git clone https://github.com/bats-core/bats-core.git /tmp/bats
 	cd /tmp/bats && sudo ./install.sh /usr/local
 	rm -rf /tmp/bats
 endif
