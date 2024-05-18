@@ -1,0 +1,69 @@
+---
+name: "tagged-release"
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  attestations: write
+  id-token: write
+  contents: write
+
+jobs:
+  tagged-release:
+    name: tagged-release
+    runs-on: ubuntu-22.04
+    env:
+      CI_BRANCH: release
+      PACKAGECLOUD_REPOSITORY: dokku/dokku
+      VERSION: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Repository Name
+        id: repo-name
+        run: |
+          echo "REPOSITORY_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)" >> $GITHUB_OUTPUT
+
+      - name: Build binaries
+        run: |
+          mkdir -p dist
+          make version build/linux/${{ steps.repo-name.outputs.REPOSITORY_NAME }}
+          cp build/linux/${{ steps.repo-name.outputs.REPOSITORY_NAME }} dist/${{ steps.repo-name.outputs.REPOSITORY_NAME }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1.176.0
+        with:
+          bundler-cache: true
+          working-directory: .github
+
+      - name: Build Debian Packages
+        run: |
+          bundle exec make build/deb/${{ steps.repo-name.outputs.REPOSITORY_NAME }}_${{ github.ref_name }}_all.deb
+          cp build/deb/*.deb dist/
+        env:
+          BUNDLE_GEMFILE: .github/Gemfile
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*
+
+      - name: Release to PackageCloud
+        run: bundle exec make release-packagecloud
+        env:
+          BUNDLE_GEMFILE: .github/Gemfile
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+          make_latest: "true"

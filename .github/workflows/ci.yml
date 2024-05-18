@@ -5,65 +5,33 @@ name: CI
 on:
   pull_request:
     branches:
-      - '*'
+      - "*"
   push:
     branches:
-      - 'master'
-      - 'release'
+      - "main"
 
 jobs:
   build:
     name: build
     runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: true
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: extract branch name
-        shell: bash
-        run: |
-          if [[ "$GITHUB_REF" == *"/pull/"* ]]; then
-            echo "branch=${GITHUB_HEAD_REF#refs/heads/}" >> $GITHUB_OUTPUT
-          else
-            echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-          fi
-        id: extract_branch
-
       - name: setup
         run: |
-            make version
-            if [[ "$CI_BRANCH" == "release" ]]; then
-              export PACKAGECLOUD_REPOSITORY=dokku/dokku
-              make .env.docker
-            fi
-            make ci-setup
+          make version ci-setup
         env:
-          CI_BRANCH: ${{ steps.extract_branch.outputs.branch }}
           PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
 
       - name: build
         run: make build-docker-image build-in-docker
-        env:
-          CI_BRANCH: ${{ steps.extract_branch.outputs.branch }}
 
       - name: test
         run: make validate-in-docker
-        env:
-          CI_BRANCH: ${{ steps.extract_branch.outputs.branch }}
 
       - name: upload packages
         uses: actions/upload-artifact@v4
         with:
           name: build
           path: build
-
-      - name: release
-        run: |
-            if [[ "$CI_BRANCH" == "release" ]]; then
-              make release-in-docker release-packagecloud-in-docker
-            fi
-        env:
-          CI_BRANCH: ${{ steps.extract_branch.outputs.branch }}
