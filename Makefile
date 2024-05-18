@@ -151,7 +151,7 @@ lint: shellcheck bats
 unit-tests: /usr/local/bin/sshcommand
 	@echo running unit tests...
 	@mkdir -p test-results/bats
-	@$(QUIET) TERM=linux bats --formatter bats-format-junit -e -T -o test-results/bats tests/unit
+	@$(QUIET) TERM=linux bats --report-formatter junit --timing -o test-results/bats tests/unit
 
 pre-build:
 	git config --global --add safe.directory $(shell pwd)
@@ -177,7 +177,7 @@ ifneq ($(shell bats --version >/dev/null 2>&1 ; echo $$?),0)
 	brew install bats-core
 endif
 else
-	git clone https://github.com/josegonzalez/bats-core.git /tmp/bats
+	git clone https://github.com/bats-core/bats-core.git /tmp/bats
 	cd /tmp/bats && sudo ./install.sh /usr/local
 	rm -rf /tmp/bats
 endif
