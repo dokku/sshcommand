@@ -81,6 +81,11 @@ build/deb/$(NAME)_$(VERSION)_all.deb: build/linux/$(NAME)
 		&& fpm \
 		--architecture all \
 		--category admin \
+		--depends adduser \
+		--depends coreutils \
+		--depends jq \
+		--depends libc-bin \
+		--depends openssh-client \
 		--description "$$PACKAGE_DESCRIPTION" \
 		--input-type dir \
 		--license 'MIT License' \
