@@ -15,7 +15,7 @@ permissions:
 jobs:
   tagged-release:
     name: tagged-release
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       CI_BRANCH: release
       PACKAGECLOUD_REPOSITORY: dokku/dokku
