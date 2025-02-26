@@ -86,10 +86,48 @@ fn-adduser() {
   esac
 }
 
+fn-verify-file() {
+  declare desc="Test that public key is valid"
+  declare file="$1"
+  local has_errors=false
+
+  local key line=0
+  local TMP_KEY_FILE
+  TMP_KEY_FILE=$(mktemp "/tmp/dokku-${DOKKU_PID}-${FUNCNAME[0]}.XXXXXX")
+  # shellcheck disable=SC2064
+  trap "rm -rf '$TMP_KEY_FILE' >/dev/null" RETURN INT TERM EXIT
+
+  SSHCOMMAND_IGNORE_LIST_WARNINGS="${SSHCOMMAND_IGNORE_LIST_WARNINGS:-false}"
+  while read -r key; do
+    line=$((line + 1))
+    [[ -z "$key" ]] && continue
+    [[ "$key" =~ ^#.*$ ]] && continue
+
+    echo "$key" >"$TMP_KEY_FILE"
+    if ! ssh-keygen -lf "$TMP_KEY_FILE" &>/dev/null; then
+      has_errors=true
+      if [[ "$SSHCOMMAND_IGNORE_LIST_WARNINGS" == "false" ]]; then
+        log-warn "${file} line $line failed ssh-keygen check."
+      else
+        log-warn "${file} line $line failed ssh-keygen check, ignoring."
+      fi
+    fi
+  done <"${file}"
+
+  if [[ "$has_errors" == "true" ]]; then
+    return 1
+  fi
+}
+
 log-fail() {
   declare desc="Log fail formatter"
   echo "$@" 1>&2
   exit 1
+}
+
+log-warn() {
+  declare desc="Log warn formatter"
+  echo "$@" 1>&2
 }
 
 log-verbose() {
@@ -208,6 +246,11 @@ sshcommand-list() {
   userhome=$(sh -c "echo ~$USER")
   [[ -e "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys not found for $USER"
   [[ -s "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys is empty for $USER"
+
+  SSHCOMMAND_IGNORE_LIST_WARNINGS="${SSHCOMMAND_IGNORE_LIST_WARNINGS:-false}"
+  if ! fn-verify-file "$userhome/.ssh/authorized_keys" && [[ "$SSHCOMMAND_IGNORE_LIST_WARNINGS" == "false" ]]; then
+    return 1
+  fi
 
   if [[ -n "$OUTPUT_TYPE" ]] && [[ "$OUTPUT_TYPE" == "json" ]]; then
     data=$(sed --silent --regexp-extended \

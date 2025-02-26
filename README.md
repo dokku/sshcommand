@@ -82,3 +82,23 @@ no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding
 
 This can be useful for cases where the ssh server does not allow certain options or you
 wish to further constrain a user's environment. Please see `man sshd` for more information.
+
+Existing keys can be listed via the `list` subcommand:
+
+```shell
+# in text format
+sshcommand list cmd
+
+# filter by a particular name
+sshcommand list cmd progrium
+
+# in json format
+sshcommand list cmd "" json
+
+# with name filtering
+sshcommand list cmd progrium json
+
+# ignore validation errors (though they will be printed to stderr)
+export SSHCOMMAND_IGNORE_LIST_WARNINGS=true
+sshcommand list cmd
+```
