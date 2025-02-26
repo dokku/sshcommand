@@ -254,7 +254,7 @@ sshcommand-list() {
 
   if [[ -n "$OUTPUT_TYPE" ]] && [[ "$OUTPUT_TYPE" == "json" ]]; then
     data=$(sed --silent --regexp-extended \
-      's/^command="FINGERPRINT=(\S+) NAME=(\\"|)(.*)\2 `.*",(\S+).*/{ "fingerprint": "\1", "name": "\3", "SSHCOMMAND_ALLOWED_KEYS": "\4" }/p' \
+      's/^command="FINGERPRINT=(\S+) NAME=(\\"|)(.*)\2 `.*",(\S+) (.*)/{ "fingerprint": "\1", "name": "\3", "SSHCOMMAND_ALLOWED_KEYS": "\4", "public-key": "\5" }/p' \
       "$userhome/.ssh/authorized_keys" | tr '\n' ',' | sed '$s/,$/\n/')
 
     if [[ -n "$NAME" ]]; then
