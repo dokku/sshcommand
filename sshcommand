@@ -241,13 +241,30 @@ sshcommand-list() {
   declare desc="Lists SSH keys by user, an optional name and a optional output format (JSON)"
   declare userhome USER="$1" NAME="$2" OUTPUT_TYPE="${3:-$2}"
   [[ -z "$USER" ]] && log-fail "Usage: sshcommand list" "$(fn-args "sshcommand-list")"
+  SSHCOMMAND_IGNORE_LIST_WARNINGS="${SSHCOMMAND_IGNORE_LIST_WARNINGS:-false}"
 
   getent passwd "$USER" >/dev/null || log-fail "\"$USER\" is not a user on this system"
   userhome=$(sh -c "echo ~$USER")
-  [[ -e "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys not found for $USER"
-  [[ -s "$userhome/.ssh/authorized_keys" ]] || log-fail "authorized_keys is empty for $USER"
+  if [[ ! -e "$userhome/.ssh/authorized_keys" ]]; then
+    log-warn "authorized_keys not found for $USER"
+    if [[ "$SSHCOMMAND_IGNORE_LIST_WARNINGS" == "false" ]]; then
+      return 1
+    fi
+    return
+  fi
 
-  SSHCOMMAND_IGNORE_LIST_WARNINGS="${SSHCOMMAND_IGNORE_LIST_WARNINGS:-false}"
+  if [[ ! -s "$userhome/.ssh/authorized_keys" ]]; then
+    log-warn "authorized_keys is empty for $USER"
+    if [[ "$SSHCOMMAND_IGNORE_LIST_WARNINGS" == "false" ]]; then
+      return 1
+    fi
+
+    if [[ "$OUTPUT_TYPE" == "json" ]]; then
+      echo "[]"
+    fi
+    return
+  fi
+
   if ! fn-verify-file "$userhome/.ssh/authorized_keys" && [[ "$SSHCOMMAND_IGNORE_LIST_WARNINGS" == "false" ]]; then
     return 1
   fi
