@@ -245,7 +245,7 @@ sshcommand-list() {
 
   getent passwd "$USER" >/dev/null || log-fail "\"$USER\" is not a user on this system"
   userhome=$(sh -c "echo ~$USER")
-  if [[ -e "$userhome/.ssh/authorized_keys" ]]; then
+  if [[ ! -e "$userhome/.ssh/authorized_keys" ]]; then
     log-warn "authorized_keys not found for $USER"
     if [[ "$SSHCOMMAND_IGNORE_LIST_WARNINGS" == "false" ]]; then
       return 1
