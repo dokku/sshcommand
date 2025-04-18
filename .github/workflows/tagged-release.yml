@@ -37,7 +37,7 @@ jobs:
           cp build/linux/${{ steps.repo-name.outputs.REPOSITORY_NAME }} dist/${{ steps.repo-name.outputs.REPOSITORY_NAME }}
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.231.0
+        uses: ruby/setup-ruby@v1.232.0
         with:
           bundler-cache: true
           working-directory: .github
