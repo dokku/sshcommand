@@ -71,7 +71,7 @@ fn-adduser() {
       adduser -D -g "" -s /bin/bash "$l_user"
       passwd -u "$l_user"
       ;;
-    debian* | ubuntu | raspbian*)
+    debian* | ubuntu)
       adduser --disabled-password --gecos "" "$l_user"
       ;;
     arch | amzn)
