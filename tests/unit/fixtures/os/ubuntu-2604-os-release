@@ -1,0 +1,11 @@
+NAME="Ubuntu"
+VERSION="26.04 LTS (Resolute Raccoon)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 26.04 LTS"
+VERSION_ID="26.04"
+VERSION_CODENAME=resolute
+UBUNTU_CODENAME=resolute
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
