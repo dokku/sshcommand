@@ -11,6 +11,12 @@ load test_helper
   assert_output "ubuntu"
   assert_success
 
+  SSHCOMMAND_OSRELEASE=$BATS_TEST_DIRNAME/fixtures/os/ubuntu-2604-os-release run "fn-print-os-id"
+  echo "output: $output"
+  echo "status: $status"
+  assert_output "ubuntu"
+  assert_success
+
   SSHCOMMAND_OSRELEASE=$BATS_TEST_DIRNAME/fixtures/os/debian-jessie-os-release run "fn-print-os-id"
   echo "output: $output"
   echo "status: $status"
